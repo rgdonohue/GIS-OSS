@@ -1,8 +1,8 @@
 # GIS-OSS — Private Geospatial Intelligence Sandbox
 
 GIS-OSS is a privacy-first geospatial intelligence sandbox that lets regulated teams experiment with AI-driven GIS workflows
-without sending data off-site. An open-weight language model (Qwen/Llama today; GPT-OSS-ready) interprets natural-language
-requests and routes them through deterministic PostGIS/GDAL tools so every map, metric, and report is auditable. The stack
+without sending data off-site. Open-weight language models (Qwen 2.5, Llama 3.1, or similar) interpret natural-language
+requests and route them through deterministic PostGIS/GDAL tools so every map, metric, and report is auditable. The stack
 ships with Docker-based infrastructure, offline-ready datasets, and governance hooks—license tracking, audit logs, and carbon
 reporting—that match public-sector compliance needs. It’s the foundation for client workshops and modernization projects that
 want AI copilots inside ESRI-heavy environments.
@@ -29,11 +29,73 @@ want AI copilots inside ESRI-heavy environments.
 See `docs/architecture.md` for the full component breakdown.
 
 ## Use Cases We Can Demo Quickly
-- **Emergency response**: “List shelters within 1 km of schools, avoiding flood zones.”
-- **Urban planning**: “Summarize by neighborhood where permits jumped since 2020 and map the hotspots.”
-- **Environmental compliance**: “Flag parcels intersecting riparian buffers and return a permit-ready report.”
+- **Emergency response**: "List shelters within 1 km of schools, avoiding flood zones."
+- **Urban planning**: "Summarize by neighborhood where permits jumped since 2020 and map the hotspots."
+- **Environmental compliance**: "Flag parcels intersecting riparian buffers and return a permit-ready report."
 
 Each scenario exercises NL→SQL translation, spatial joins, and narrative reporting that technical trainers can teach hands-on.
+
+## Expanded Use Case Brainstorm
+
+*The following represents potential applications across various domains. These are aspirational examples showing the breadth of spatial intelligence queries the system could handle as it matures.*
+
+### Infrastructure & Utilities
+- "Identify all properties within 500ft of gas pipelines that have had construction permits in the last year"
+- "Find optimal routes for new fiber optic cables avoiding wetlands, historic sites, and existing utilities"
+- "Map all substations within wildfire risk zones and their dependent critical facilities"
+- "Prioritize pipe replacement based on age, material, break history, and social vulnerability index"
+
+### Environmental & Conservation
+- "Buffer all eagle nesting sites by 660ft and identify conflicting development permits"
+- "Track wetland changes over the past decade using Sentinel imagery"
+- "Calculate urban heat island severity by census block and overlay with vulnerable populations"
+- "Flag all industrial sites within 1000ft of schools, daycares, or hospitals"
+
+### Public Safety & Emergency Management
+- "Calculate drive times from each neighborhood to nearest shelter avoiding predicted flood zones"
+- "Find optimal staging areas for emergency supplies serving maximum population within 10 minutes"
+- "Map all structures beyond 1000ft from a fire hydrant with occupancy over 50"
+- "Identify high-risk structures: wood construction + poor access + vulnerable occupants"
+
+### Transportation & Mobility
+- "Find gaps in transit coverage where low-income populations exceed 30% beyond 1/4 mile of stops"
+- "Correlate accident hotspots with road geometry, lighting, and traffic volumes"
+- "Map sidewalk gaps within 1/2 mile of schools and senior centers"
+- "Calculate pedestrian level of stress scores for all intersections"
+
+### Land Use & Development
+- "List all non-conforming uses within 500ft of proposed rezoning areas"
+- "Find parcels zoned commercial with >1 acre and within 1/4 mile of transit"
+- "Identify underutilized parcels suitable for affordable housing near jobs and transit"
+- "Map gentrification risk based on property value changes, permits, and demographic shifts"
+
+### Agriculture & Natural Resources
+- "Calculate field-specific irrigation needs based on soil type, slope, and crop water requirements"
+- "Map forest stands ready for thinning based on age, density, and proximity to roads"
+- "Track reclamation progress against permit requirements using temporal imagery"
+- "Identify high-value timber at risk from pest infestations or disease"
+
+### Public Health & Social Services
+- "Map healthcare deserts: populations >30 minutes from emergency care"
+- "Overlay social vulnerability index with environmental hazards and access to services"
+- "Find cooling center gaps during extreme heat events for elderly populations"
+- "Cluster disease incidence adjusting for population density and demographics"
+
+### Real Estate & Property Management
+- "Find all commercial properties with >10,000 sq ft, parking ratio >4:1000, near highway access"
+- "Map portfolio climate risk exposure across flood, wildfire, and hurricane zones"
+- "Calculate 5-minute walkability scores for all multifamily properties"
+- "Screen sites for solar potential based on roof area, orientation, and shading"
+
+### Common Query Patterns
+The system recognizes these spatial analysis patterns:
+- **Proximity**: "within X distance of Y"
+- **Containment**: "inside boundary of Z"
+- **Intersection**: "overlapping with features"
+- **Network analysis**: "connected via infrastructure"
+- **Temporal**: "changes between time periods"
+- **Multi-criteria**: "meeting all requirements A, B, and C"
+- **Optimization**: "best location for objective"
 
 ## Current Status
 - Draft backlog in `TODO.md` covering the first four weeks (environment, spatial functions, NL interface, governance).
