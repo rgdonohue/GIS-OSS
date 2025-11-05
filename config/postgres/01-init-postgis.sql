@@ -65,8 +65,11 @@ CREATE TABLE IF NOT EXISTS data.embeddings (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Create vector index for similarity search
-CREATE INDEX idx_embeddings_vector ON data.embeddings USING ivfflat (embedding vector_cosine_ops);
+-- Create vector index for similarity search (set lists per pgvector requirements)
+CREATE INDEX idx_embeddings_vector
+    ON data.embeddings
+    USING ivfflat (embedding vector_cosine_ops)
+    WITH (lists = 100);
 
 -- Create governance schema
 CREATE SCHEMA IF NOT EXISTS governance;
@@ -127,10 +130,13 @@ END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
 -- Grant permissions (adjust as needed)
-GRANT USAGE ON SCHEMA data TO PUBLIC;
-GRANT SELECT ON ALL TABLES IN SCHEMA data TO PUBLIC;
-GRANT USAGE ON SCHEMA governance TO PUBLIC;
-GRANT SELECT ON ALL TABLES IN SCHEMA governance TO PUBLIC;
+GRANT USAGE ON SCHEMA data TO gis_user;
+GRANT SELECT ON ALL TABLES IN SCHEMA data TO gis_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA data GRANT SELECT ON TABLES TO gis_user;
+
+GRANT USAGE ON SCHEMA governance TO gis_user;
+GRANT SELECT ON ALL TABLES IN SCHEMA governance TO gis_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA governance GRANT SELECT ON TABLES TO gis_user;
 
 -- Add comment documentation
 COMMENT ON SCHEMA data IS 'Main schema for spatial and vector data';

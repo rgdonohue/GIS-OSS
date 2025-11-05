@@ -139,6 +139,15 @@ if [ -f .env ]; then
     fi
 fi
 
+# Load offline mode flag from .env if not already exported
+if [ -z "${ENABLE_OFFLINE_MODE:-}" ] && [ -f .env ]; then
+    env_offline=$(grep -E '^ENABLE_OFFLINE_MODE=' .env | tail -n1 | cut -d= -f2- | tr -d '[:space:]"')
+    if [ -n "$env_offline" ]; then
+        ENABLE_OFFLINE_MODE="${env_offline}"
+    fi
+fi
+ENABLE_OFFLINE_MODE=${ENABLE_OFFLINE_MODE:-false}
+
 # Download sample data (skip if offline mode)
 echo -e "\n${YELLOW}Checking for sample data...${NC}"
 

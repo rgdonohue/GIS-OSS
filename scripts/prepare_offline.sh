@@ -15,6 +15,23 @@ echo -e "${GREEN}=== GIS-OSS Offline Preparation ===${NC}"
 echo "This script downloads all dependencies for offline/air-gapped deployment"
 echo
 
+# Check prerequisites
+echo -e "${YELLOW}Checking prerequisites...${NC}"
+missing=false
+for cmd in curl docker pip; do
+    if ! command -v "${cmd}" >/dev/null 2>&1; then
+        echo -e "${RED}  Error: ${cmd} is required but not installed${NC}"
+        missing=true
+    else
+        echo "  • ${cmd}"
+    fi
+done
+
+if [ "${missing}" = true ]; then
+    echo -e "${RED}Missing prerequisites. Install the tools above and re-run this script.${NC}"
+    exit 1
+fi
+
 # Create necessary directories
 mkdir -p data cache models offline-deps
 
@@ -32,9 +49,9 @@ fi
 # Natural Earth data (public domain)
 if [ ! -f data/ne_10m_admin_0_countries.geojson ]; then
     echo "  Downloading Natural Earth countries..."
-    curl -L -o data/ne_10m_admin_0_countries.zip \
-        "https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural/ne_10m_admin_0_countries.zip" \
-        2>/dev/null || echo "Failed to download Natural Earth data"
+    curl -L -o data/ne_10m_admin_0_countries.geojson \
+        "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_admin_0_countries.geojson" \
+        2>/dev/null || echo "Failed to download Natural Earth GeoJSON"
 fi
 
 # Download PROJ database for offline CRS lookups
