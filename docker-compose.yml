@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgis/postgis:15-3.4
+    container_name: gis-oss-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-gis_oss}
+      POSTGRES_USER: ${POSTGRES_USER:-gis_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./config/postgres:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-gis_user} -d ${POSTGRES_DB:-gis_oss}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - gis-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: gis-oss-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - gis-network
+
+  titiler:
+    image: ghcr.io/developmentseed/titiler:latest
+    container_name: gis-oss-titiler
+    ports:
+      - "${TITILER_PORT:-8081}:8081"
+    environment:
+      PORT: 8081
+      WORKERS: ${TITILER_WORKERS:-2}
+    networks:
+      - gis-network
+
+  # Commented out until Week 2
+  # vllm:
+  #   image: vllm/vllm-openai:latest
+  #   container_name: gis-oss-vllm
+  #   ports:
+  #     - "${VLLM_PORT:-8000}:8000"
+  #   volumes:
+  #     - ./models:/models:ro
+  #   environment:
+  #     MODEL: ${MODEL_NAME:-Qwen/Qwen2.5-7B-Instruct}
+  #     QUANTIZATION: ${MODEL_QUANTIZATION:-int8}
+  #     MAX_MODEL_LEN: ${MODEL_MAX_TOKENS:-16384}
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [gpu]
+  #   networks:
+  #     - gis-network
+
+  # Optional: Nominatim for offline geocoding (uncomment if needed)
+  # nominatim:
+  #   image: mediagis/nominatim:4.2
+  #   container_name: gis-oss-nominatim
+  #   ports:
+  #     - "${NOMINATIM_PORT:-8082}:8080"
+  #   environment:
+  #     PBF_URL: https://download.geofabrik.de/north-america/us/rhode-island-latest.osm.pbf
+  #     REPLICATION_URL: https://download.geofabrik.de/north-america/us/rhode-island-updates/
+  #   volumes:
+  #     - nominatim_data:/var/lib/postgresql/14/main
+  #   networks:
+  #     - gis-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  nominatim_data:
+
+networks:
+  gis-network:
+    driver: bridge

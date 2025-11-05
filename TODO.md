@@ -1,0 +1,166 @@
+# GIS-OSS Development Backlog
+
+## Week 1: Foundation Infrastructure
+
+### Day 1-2: Environment Setup
+- [ ] Create docker-compose.yml with PostgreSQL 15 + PostGIS 3.4
+- [ ] Add pgvector extension to Postgres initialization
+- [ ] Set up .env.example with all required variables
+- [ ] Create basic .gitignore for Python/Node/Docker
+- [ ] Write setup_dev.sh script for one-command initialization
+
+### Day 3-4: Spatial Functions
+- [ ] Create src/spatial/postgis_ops.py with 5 core functions:
+  - [ ] buffer_geometry(geom, distance, units)
+  - [ ] calculate_area(geom, units)
+  - [ ] find_intersections(geom1, geom2)
+  - [ ] nearest_neighbors(geom, table, limit)
+  - [ ] transform_crs(geom, from_epsg, to_epsg)
+- [ ] Add input validation for each function
+- [ ] Write pytest tests for each function
+
+### Day 5: Data Loading
+- [ ] Create scripts/load_sample_data.py
+- [ ] Download small OSM extract (< 100MB)
+- [ ] Load into PostGIS with proper indexes
+- [ ] Create sample STAC catalog entry
+- [ ] Document data sources and licenses
+
+## Week 2: API and Basic LLM
+
+### Day 6-7: FastAPI Setup
+- [ ] Create src/api/main.py with basic app structure
+- [ ] Add /health and /ready endpoints
+- [ ] Create /query endpoint (stub, returns mock data)
+- [ ] Add request/response models with Pydantic
+- [ ] Set up structured logging
+
+### Day 8-9: Model Integration
+- [ ] Document model selection rationale (Qwen vs Llama)
+- [ ] Create scripts/download_model.py for model fetching
+- [ ] Set up vLLM or llama.cpp server
+- [ ] Create src/llm/client.py with inference wrapper
+- [ ] Test basic prompt completion
+
+### Day 10: Integration Testing
+- [ ] Connect LLM to spatial functions
+- [ ] Create 10 test queries with expected outputs
+- [ ] Implement basic NL→SQL translation
+- [ ] Add fallback handling for errors
+- [ ] Document accuracy baseline
+
+## Week 3: Governance & Security Foundation
+
+### Audit & Attribution
+- [ ] Create src/governance/audit_logger.py with structured event logging
+- [ ] Implement src/governance/attribution.py for license tracking
+- [ ] Add license field to all data ingestion pipelines
+- [ ] Create attribution template for API responses
+- [ ] Write tests for attribution engine
+
+### Data Governance
+- [ ] Design metadata schema for dual publishing (CC-BY vs ODbL)
+- [ ] Create scripts/split_by_license.py for data separation
+- [ ] Implement src/governance/license_validator.py
+- [ ] Add STAC metadata enrichment with license info
+- [ ] Document compliance workflow in docs/governance.md
+
+### Security Basics
+- [ ] Implement API key authentication middleware
+- [ ] Add rate limiting with slowapi
+- [ ] Create src/security/geometry_generalizer.py (>50m resolution)
+- [ ] Set up basic request/response logging
+- [ ] Document security model in docs/security.md
+
+## Week 4: Offline Capabilities
+
+### Offline Dependencies
+- [ ] Bundle proj.db for offline CRS lookups
+- [ ] Create scripts/download_offline_data.py
+- [ ] Implement fallback logic for external APIs
+- [ ] Set up response caching with Redis/SQLite
+- [ ] Test air-gapped deployment scenario
+
+### Local Services
+- [ ] Set up Nominatim docker container (optional)
+- [ ] Create static carbon intensity lookup table
+- [ ] Implement offline model loading from ./models/
+- [ ] Add PMTiles basemap support
+- [ ] Document offline setup in docs/offline.md
+
+## Prioritization Notes
+
+**Must Have (Week 1)**:
+- Working PostGIS with sample data
+- 5 tested spatial functions
+- Basic API structure
+
+**Should Have (Week 2)**:
+- LLM integration with small model
+- Simple NL→SQL translation
+- Error handling
+
+**Week 3 (Governance)**:
+- Audit logging system
+- License attribution
+- Basic security (auth, rate limit)
+
+**Week 4 (Offline)**:
+- Bundled offline data
+- Fallback mechanisms
+- Air-gapped testing
+
+**Defer to Phase 2**:
+- OAuth/OIDC integration
+- Advanced PII protection
+- Production carbon tracking
+- Multi-tenant RLS
+
+## Success Criteria
+
+### Week 1 Checkpoint
+- [ ] `docker-compose up` starts all services
+- [ ] Can query PostGIS directly via psql
+- [ ] Spatial functions pass unit tests
+- [ ] Sample data loads successfully
+
+### Week 2 Checkpoint
+- [ ] API responds to health checks
+- [ ] LLM model loads and infers
+- [ ] 5/10 test queries return correct results
+- [ ] Errors handled gracefully
+
+## Risk Register
+
+| Risk | Mitigation |
+|------|------------|
+| Model too large for hardware | Use smaller model (7B) or aggressive quantization |
+| PostGIS complexity | Start with just 3 functions, expand later |
+| LLM hallucinations | Implement strict output validation |
+| Data licensing issues | Use only CC0/OpenData sources initially |
+
+## Dependencies
+
+### External Services
+- [ ] EPSG.io for CRS metadata (mock for offline)
+- [ ] OSM Nominatim for geocoding (optional)
+- [ ] WattTime API (mock for development)
+
+### Python Packages
+```
+fastapi==0.104.0
+pydantic==2.5.0
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.23
+geoalchemy2==0.14.2
+shapely==2.0.2
+rasterio==1.3.9
+vllm==0.2.7  # or llama-cpp-python
+pytest==7.4.3
+```
+
+### System Requirements
+- Docker & Docker Compose
+- 16GB+ RAM
+- 50GB+ disk space
+- NVIDIA GPU with 24GB+ VRAM (optional for Week 1)
