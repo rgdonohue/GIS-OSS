@@ -1,5 +1,14 @@
 # GIS-OSS — Private Geospatial Intelligence Sandbox
 
+GIS-OSS is a privacy-first geospatial intelligence sandbox that lets regulated teams experiment with AI-driven GIS workflows
+without sending data off-site. An open-weight language model (Qwen/Llama today; GPT-OSS-ready) interprets natural-language
+requests and routes them through deterministic PostGIS/GDAL tools so every map, metric, and report is auditable. The stack
+ships with Docker-based infrastructure, offline-ready datasets, and governance hooks—license tracking, audit logs, and carbon
+reporting—that match public-sector compliance needs. It’s the foundation for client workshops and modernization projects that
+want AI copilots inside ESRI-heavy environments.
+
+![GIS OSS image](gis-oss.png)
+
 ## Executive Overview
 - Builds an on-prem, privacy-preserving spatial assistant driven by open-weight LLMs.
 - Orchestrates deterministic PostGIS/GDAL tooling so every result is auditable.
