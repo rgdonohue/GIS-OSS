@@ -123,6 +123,7 @@ GIS-OSS is a privacy-focused geospatial intelligence system that uses open-weigh
 - **Carbon Metrics**: Static grid intensity lookup table (updated quarterly)
 - **Models**: Pre-downloaded to ./models/ directory
 - **Base Maps**: Local MBTiles or PMTiles for visualization
+- **Preparation**: Run `scripts/prepare_offline.sh` to download all dependencies
 
 ### Hybrid Mode
 - Cache external API responses for 7 days

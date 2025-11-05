@@ -32,10 +32,10 @@ Each scenario exercises NL→SQL translation, spatial joins, and narrative repor
 - Docker Compose + PostGIS scaffold ready; model selection: Qwen 2.5 7B/32B or Llama 3.1 8B/70B.
 
 ## Roadmap (Phase 0 Pilot)
-1. **Week 1** – Stand up PostGIS/pgvector stack, load sample datasets, expose five audited spatial tools.
-2. **Week 2** – Wire FastAPI façade, connect LLM orchestrator, capture baseline accuracy/latency on ten scripted queries.
-3. **Week 3** – Layer retrieval augmentation, enrich attribution pipeline, and ship trainer-friendly notebooks.
-4. **Week 4** – Package demo runbook + workshop deck for client pilots; decision gate on extending to 120B model.
+1. **Step 1** – Stand up PostGIS/pgvector stack, load sample datasets, expose five audited spatial tools.
+2. **Step 2** – Wire FastAPI façade, connect LLM orchestrator, capture baseline accuracy/latency on ten scripted queries.
+3. **Step 3** – Layer retrieval augmentation, enrich attribution pipeline, and ship trainer-friendly notebooks.
+4. **Step 4** – Package demo runbook + workshop deck for client pilots; decision gate on extending to 120B model.
 
 ## Value for Technical Training & Services
 - Provides a ready-made lab for AI-in-GIS workshops, with deterministic outputs your trainers can trust.
@@ -46,8 +46,13 @@ Each scenario exercises NL→SQL translation, spatial joins, and narrative repor
 ## Getting Started (Developers)
 1. Install Docker & Docker Compose (v2+).
 2. Clone this repository and copy `.env.example` to `.env` with local credentials.
-3. Run `./setup_dev.sh` (to be added) to launch PostGIS, TiTiler, and auxiliary services.
+3. Run `./scripts/setup_dev.sh` to launch PostGIS, TiTiler, and auxiliary services.
 4. Execute `pytest` to validate spatial tool wrappers before integrating the LLM service.
+
+### For Offline/Air-gapped Deployment
+1. On a connected machine, run `./scripts/prepare_offline.sh` to download all dependencies.
+2. Transfer the entire project directory including `offline-deps/` to the target system.
+3. Set `ENABLE_OFFLINE_MODE=true` in `.env` and follow `offline-deps/OFFLINE_INSTALL.md`.
 
 > Note: Model weights are large (7B-70B parameters). We recommend starting with Qwen 2.5 7B (INT8) for development on single GPU, scaling to 32B/70B models for production accuracy.
 

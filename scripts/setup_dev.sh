@@ -139,14 +139,28 @@ if [ -f .env ]; then
     fi
 fi
 
-# Download sample data
-echo -e "\n${YELLOW}Downloading sample data...${NC}"
-if [ ! -f data/sample_data.json ]; then
+# Download sample data (skip if offline mode)
+echo -e "\n${YELLOW}Checking for sample data...${NC}"
+
+# Check if we're in offline mode via environment variable
+if [ "${ENABLE_OFFLINE_MODE}" = "true" ]; then
+    echo "⚠ Offline mode enabled - skipping sample data download"
+    echo "  Place sample GeoJSON files in ./data/ manually"
+elif [ ! -f data/us-states.json ]; then
+    echo "Downloading sample data..."
     # Download a small GeoJSON sample (US states boundaries)
-    curl -L -o data/us-states.json \
+    # Note: This requires internet connection. For air-gapped environments,
+    # pre-download this file and place in ./data/
+    if curl -L -o data/us-states.json \
         "https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json" \
-        2>/dev/null || echo "Warning: Could not download sample data"
-    echo "✓ Sample data downloaded"
+        2>/dev/null; then
+        echo "✓ Sample data downloaded"
+    else
+        echo -e "${YELLOW}⚠ Warning: Could not download sample data${NC}"
+        echo "  For offline operation, manually download:"
+        echo "  https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json"
+        echo "  and place in ./data/us-states.json"
+    fi
 else
     echo "✓ Sample data already exists"
 fi
