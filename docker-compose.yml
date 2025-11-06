@@ -48,6 +48,34 @@ services:
     networks:
       - gis-network
 
+  # Planned: Vector tile server (Week 5)
+  # pg_tileserv:
+  #   image: pramsey/pg_tileserv:latest
+  #   container_name: gis-oss-pg-tileserv
+  #   environment:
+  #     DATABASE_URL: postgresql://${POSTGRES_USER:-gis_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-gis_oss}
+  #   ports:
+  #     - "${PG_TILESERVER_PORT:-7800}:7800"
+  #   depends_on:
+  #     - postgres
+  #   networks:
+  #     - gis-network
+
+  # Alternative vector tiles via martin (Rust-based)
+  # martin:
+  #   image: urbica/martin:latest
+  #   container_name: gis-oss-martin
+  #   volumes:
+  #     - ./config/martin:/etc/martin:ro
+  #   environment:
+  #     DATABASE_URL: postgresql://${POSTGRES_USER:-gis_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-gis_oss}
+  #   ports:
+  #     - "${MARTIN_PORT:-3000}:3000"
+  #   depends_on:
+  #     - postgres
+  #   networks:
+  #     - gis-network
+
   # Commented out until Week 2
   # vllm:
   #   image: vllm/vllm-openai:latest
@@ -84,10 +112,72 @@ services:
   #   networks:
   #     - gis-network
 
+  # Planned: Workflow orchestration (Week 6)
+  # airflow:
+  #   image: apache/airflow:2.9.1
+  #   container_name: gis-oss-airflow
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     AIRFLOW__CORE__EXECUTOR: LocalExecutor
+  #     AIRFLOW_UID: 50000
+  #   volumes:
+  #     - ./pipeline/airflow/dags:/opt/airflow/dags
+  #     - airflow_logs:/opt/airflow/logs
+  #     - airflow_plugins:/opt/airflow/plugins
+  #   ports:
+  #     - "${AIRFLOW_PORT:-8083}:8080"
+  #   depends_on:
+  #     - postgres
+  #   networks:
+  #     - gis-network
+
+  # kestra:
+  #   image: kestra/kestra:latest
+  #   container_name: gis-oss-kestra
+  #   ports:
+  #     - "${KESTRA_PORT:-8084}:8080"
+  #   volumes:
+  #     - ./pipeline/kestra:/app/config
+  #   depends_on:
+  #     - postgres
+  #   networks:
+  #     - gis-network
+
+  # redpanda:
+  #   image: docker.redpanda.com/redpandadata/redpanda:latest
+  #   container_name: gis-oss-redpanda
+  #   command:
+  #     - redpanda
+  #     - start
+  #     - --node-id=0
+  #     - --smp=1
+  #     - --memory=1G
+  #     - --reserve-memory=0M
+  #     - --overprovisioned
+  #     - --kafka-addr=PLAINTEXT://0.0.0.0:9092
+  #     - --advertise-kafka-addr=PLAINTEXT://redpanda:9092
+  #   ports:
+  #     - "${REDPANDA_PORT:-9092}:9092"
+  #   networks:
+  #     - gis-network
+
+  # Planned: Distributed spatial processing (optional)
+  # sedona-spark:
+  #   image: apache/spark:3.4.1
+  #   container_name: gis-oss-sedona
+  #   environment:
+  #     SPARK_USER: spark
+  #   command: tail -f /dev/null
+  #   networks:
+  #     - gis-network
+
 volumes:
   postgres_data:
   redis_data:
   nominatim_data:
+  # airflow_logs:
+  # airflow_plugins:
 
 networks:
   gis-network:

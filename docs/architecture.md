@@ -43,17 +43,19 @@ GIS-OSS is a privacy-focused geospatial intelligence system that uses open-weigh
        └───────────────┼──────────────┘
                        │
 ┌──────────────────────▼──────────────────────────────────┐
-│                 Spatial Engine                           │
-│  • PostGIS for vector operations                         │
-│  • GDAL/rasterio for raster processing                   │
+│                Spatial & Temporal Engine                 │
+│  • PostGIS + TimescaleDB for vector + time-series        │
+│  • GDAL/rasterio + TiTiler for COG rasters               │
+│  • Vector tiles via pg_tileserv/martin                   │
 │  • Projection management (EPSG)                          │
 └────────────────────┬────────────────────────────────────┘
                      │
 ┌────────────────────▼────────────────────────────────────┐
 │                  Data Layer                              │
-│  • PostgreSQL + PostGIS (geometries)                     │
+│  • PostgreSQL + PostGIS + TimescaleDB (geometries/time)  │
 │  • pgvector (embeddings)                                 │
-│  • Object storage (COGs/STACs)                           │
+│  • Object storage (COG, STAC collections, PMTiles)       │
+│  • Streaming bus (Kafka/Redpanda) for real-time feeds    │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -73,17 +75,26 @@ GIS-OSS is a privacy-focused geospatial intelligence system that uses open-weigh
 - **Tools**: Function calling via JSON schema
 - **Batching**: Dynamic batching with 50ms aggregation window
 
-### Spatial Engine
-- **PostGIS Functions**: ST_Buffer, ST_Intersection, ST_Distance, etc.
-- **Projections**: Auto-detect and transform via EPSG codes
-- **Validation**: Geometry validity checks before operations
-- **Offline CRS**: Bundled proj.db (150MB) for air-gapped deployments
-- **Fallback Geocoding**: Local Pelias instance or nominatim-docker
+### Spatial & Temporal Engine
+- **Vector Processing**: PostGIS core functions (ST_Buffer, ST_Intersection, ST_Distance, ST_TileEnvelope) with TimescaleDB hypertables for change-detection/temporal joins.
+- **Raster Serving**: GDAL/rasterio for batch operations, TiTiler for dynamic COG/WMTS, optional raster algebra via rio-tiler.
+- **Vector Tiles**: pg_tileserv or martin serving MVT tiles straight from PostGIS, cached via Redis/Varnish for low-latency visualization.
+- **Projection Control**: Auto-detect and transform via EPSG codes with bundled proj.db; CRS choice logged alongside every query.
+- **Validation**: Geometry validity checks and topology cleaning using `ST_IsValidDetail` + `ST_MakeValid`.
+- **Fallback Geocoding**: Local Pelias instance or nominatim-docker.
 
-### RAG System
-- **Embedding Model**: BGE-small or all-MiniLM-L6-v2
-- **Vector Store**: pgvector with HNSW indexing
-- **Retrieval**: Hybrid search (spatial + semantic)
+### RAG & Knowledge System
+- **Embedding Model**: BGE-small or all-MiniLM-L6-v2; upgrade path to Instructor-large for domain tuning.
+- **Vector Store**: pgvector with HNSW indexing; Timescale continuous aggregates expose temporal context windows.
+- **Retrieval**: Hybrid search (spatial + semantic) plus STAC metadata queries for raster provenance.
+- **Caching**: Redis layer for hot embeddings and tile metadata.
+
+### Data Pipeline & Orchestration
+- **Batch ETL**: Apache Airflow orchestrates nightly/weekly loads (COG generation, STAC catalog refreshes, pg_tileserv materialized views).
+- **Transformations**: dbt (with dbt-postgres + dbt-snowplow-spatial packages) manages versioned SQL models, documentation, and tests.
+- **Event-Driven Workflows**: Kestra handles reactive pipelines (e.g., ingesting incoming sensor feeds, triggering re-tiling).
+- **Distributed Processing**: Apache Sedona (Spark) for large-scale raster/vector processing when datasets exceed single-node capacity.
+- **Streaming Ingestion**: Kafka/Redpanda topics capture IoT/telemetry; ksqlDB or Materialize create real-time aggregates surfaced through the LLM tools.
 
 ## Data Flow
 
@@ -120,6 +131,8 @@ GIS-OSS is a privacy-focused geospatial intelligence system that uses open-weigh
 ### Offline/Air-gapped Mode
 - **CRS Data**: Bundled proj.db with full EPSG dataset
 - **Geocoding**: Local Pelias or Nominatim container with pre-loaded region
+- **Vector Tiles**: Pre-generated PMTiles (or martin cache) stored locally; MapLibre consumes from file system/HTTP.
+- **COG/PMTiles**: `scripts/prepare_offline.sh` downloads sample COGs and PMTiles; users can swap in proprietary data.
 - **Carbon Metrics**: Static grid intensity lookup table (updated quarterly)
 - **Models**: Pre-downloaded to ./models/ directory
 - **Base Maps**: Local MBTiles or PMTiles for visualization
@@ -140,7 +153,11 @@ GIS-OSS is a privacy-focused geospatial intelligence system that uses open-weigh
 ### Production (Kubernetes)
 - Horizontal scaling for API/LLM
 - Separate PostGIS cluster
-- Distributed object storage
+- TimescaleDB extension enabled for temporal workloads
+- Martin/pg_tileserv pods for vector tiles
+- TiTiler deployment for COG tiles
+- Airflow/Kestra namespaces for orchestration
+- Distributed object storage (MinIO/S3 compatible) for COG/STAC/PMTiles
 
 ### Edge (Embedded)
 - SQLite with SpatiaLite
@@ -182,8 +199,8 @@ GIS-OSS is a privacy-focused geospatial intelligence system that uses open-weigh
 
 ## Future Enhancements
 
-- [ ] Streaming data ingestion
-- [ ] Multi-model ensemble
-- [ ] Distributed processing
 - [ ] Real-time collaboration
-- [ ] Advanced visualization
+- [ ] Multi-model ensemble (LLM routing, guarded reasoning modes)
+- [ ] Advanced visualization (deck.gl analytics)
+- [ ] GPU-accelerated raster analytics (CUDA-enabled GDAL or rasterframes)
+- [ ] Edge streaming support (MQTT ingestion mapped to Kafka topics)

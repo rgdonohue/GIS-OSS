@@ -90,6 +90,34 @@
 - [ ] Add PMTiles basemap support
 - [ ] Document offline setup in docs/offline.md
 
+## Week 5: Modern GIS Services
+
+### Vector Tiles & Basemaps
+- [ ] Enable TimescaleDB extension in Postgres container
+- [ ] Add pg_tileserv (or martin) service to docker-compose.yml
+- [ ] Create tiles configuration for sample datasets (admin boundaries, permits)
+- [ ] Implement tile cache (Redis/Varnish) configuration
+- [ ] Document MapLibre integration with hosted tiles & PMTiles fallback
+
+### Raster & COG Enhancements
+- [ ] Extend TiTiler config for quad-keys/WMTS endpoints
+- [ ] Generate sample COGs and register via STAC metadata
+- [ ] Add raster algebra tool wrappers (e.g., NDVI computation)
+- [ ] Script PMTiles packaging for offline demo basemaps
+
+## Week 6: Data Pipeline & Streaming
+
+### Batch & Transformation
+- [ ] Introduce Airflow docker service with minimal DAG (COG ingest, STAC refresh)
+- [ ] Bootstrap dbt project (`pipeline/dbt/`) with spatial models and tests
+- [ ] Wire CI-style `dbt run`/`dbt test` commands into developer workflow
+
+### Event-Driven & Streaming
+- [ ] Add Kafka/Redpanda service for telemetry ingest
+- [ ] Configure Kestra flow to react to new events (e.g., sensor updates → rebuffer)
+- [ ] Prototype Timescale continuous aggregate for change detection
+- [ ] Evaluate Apache Sedona Spark job for bulk raster/vector processing
+
 ## Prioritization Notes
 
 **Must Have (Week 1)**:
@@ -111,6 +139,16 @@
 - Bundled offline data
 - Fallback mechanisms
 - Air-gapped testing
+
+**Week 5 (Spatial Services)**:
+- Vector tile service online
+- Timescale hypertables for temporal queries
+- Raster/COG tooling verified
+
+**Week 6 (Pipelines & Streaming)**:
+- Batch orchestration (Airflow + dbt)
+- Streaming ingest demo (Kafka + Kestra)
+- Sedona evaluation for scale-out workloads
 
 **Defer to Phase 2**:
 - OAuth/OIDC integration

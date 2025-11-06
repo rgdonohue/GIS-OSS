@@ -22,9 +22,10 @@ want AI copilots inside ESRI-heavy environments.
 
 ## Solution Snapshot
 - **LLM as orchestrator**: natural-language parsing and task planning only; spatial math delegated to trusted engines.
-- **Deterministic spatial core**: PostGIS 3.4, GDAL/rasterio, and TiTiler for rasters; pgvector augments search with semantic context.
+- **Deterministic spatial core**: PostGIS 3.4 + TimescaleDB for space-time analytics, GDAL/rasterio and TiTiler for COG rasters, pg_tileserv/martin for vector tiles, pgvector for semantic search.
 - **Governance built-in**: license-aware STAC catalog, audit logging, optional carbon tracking, and scripted dual-publishing workflows.
-- **Deployment flexibility**: Docker Compose for field demos, Kubernetes for production, and a lightweight edge profile (SpatiaLite + ONNX) for disconnected sites.
+- **Modern pipeline**: Airflow + dbt for batch ETL, Kestra for event-driven flows, Apache Sedona for distributed crunching, Kafka/Redpanda for streaming ingest.
+- **Deployment flexibility**: Docker Compose for field demos, Kubernetes for production, and a lightweight edge profile (SpatiaLite + ONNX + PMTiles) for disconnected sites.
 
 See `docs/architecture.md` for the full component breakdown.
 
@@ -100,7 +101,7 @@ The system recognizes these spatial analysis patterns:
 ## Current Status
 - Draft backlog in `TODO.md` covering the first four weeks (environment, spatial functions, NL interface, governance).
 - Architecture note completed with realistic specifications (`docs/architecture.md`).
-- Docker Compose + PostGIS scaffold ready; model selection: Qwen 2.5 7B/32B or Llama 3.1 8B/70B.
+- Docker Compose + PostGIS scaffold ready; upcoming additions include vector tiles (pg_tileserv), temporal extension (TimescaleDB), and orchestration stubs (Airflow/Kestra).
 
 ## Roadmap (Phase 0 Pilot)
 1. **Step 1** – Stand up PostGIS/pgvector stack, load sample datasets, expose five audited spatial tools.
@@ -127,13 +128,22 @@ The system recognizes these spatial analysis patterns:
 
 > Note: Model weights are large (7B-70B parameters). We recommend starting with Qwen 2.5 7B (INT8) for development on single GPU, scaling to 32B/70B models for production accuracy.
 
+## Modern GIS Component Map
+- **Spatial storage**: PostgreSQL + PostGIS + TimescaleDB for vector and temporal analytics.
+- **Raster services**: Cloud-optimized GeoTIFFs (COG) via TiTiler; PMTiles/MBTiles for offline basemaps.
+- **Vector delivery**: pg_tileserv (or martin) provides MVT tiles for MapLibre, cached via Redis/Varnish.
+- **Streaming**: Kafka/Redpanda topics for IoT feeds; Kestra triggers downstream processing.
+- **Batch pipeline**: Airflow orchestrates ETL, dbt manages analytical models, Apache Sedona handles large-scale Spark jobs.
+- **Toolchain**: FastAPI + LLM orchestrator + deterministic tooling, surfaced through CLI/Web/API clients.
+
 ## Repository Layout
 - `docs/` — Architecture overview, deployment notes (expanding with governance/security playbooks).
 - `core/` *(planned)* — FastAPI backend, LLM orchestration, spatial engine modules.
+- `pipeline/` *(planned)* — Airflow DAGs, dbt project, Kestra flows.
 - `web/` *(planned)* — MapLibre-based UI for demos and workshops.
-- `data/` *(planned)* — Sample GeoParquet/COG assets with clear licensing.
+- `data/` *(planned)* — Sample GeoParquet/COG/PMTiles assets with clear licensing.
 - `tests/` *(planned)* — Unit + integration harness, plus benchmark scripts.
-- `scripts/` *(planned)* — Setup, model download, and data seeding utilities.
+- `scripts/` *(planned)* — Setup, offline prep, model download, and data seeding utilities.
 
 ## Next Executive Checkpoint
 - Validate the Week 1 deliverables (running spatial stack + tested tooling).
