@@ -183,7 +183,7 @@ graph TD
     subgraph Gateway
         E[FastAPI Gateway]
         F["GraphQL Adapter\n(optional)"]
-        G[Streaming (WebSocket/SSE)]
+        G["Streaming (WebSocket/SSE)"]
     end
 
     subgraph Intelligence
