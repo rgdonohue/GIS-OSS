@@ -182,7 +182,7 @@ graph TD
 
     subgraph Gateway
         E[FastAPI Gateway]
-        F[GraphQL Adapter<br/>(optional)]
+        F["GraphQL Adapter\n(optional)"]
         G[Streaming (WebSocket/SSE)]
     end
 
@@ -205,7 +205,7 @@ graph TD
     subgraph Data & Governance
         R[PostgreSQL Schemas]
         S[pgvector + Redis]
-        T[Object Storage<br/>(COGs · PMTiles)]
+        T["Object Storage\n(COGs · PMTiles)"]
         U[STAC Catalog]
         V[Audit & Attribution Ledger]
         W[Carbon Metrics]
@@ -213,10 +213,10 @@ graph TD
     end
 
     subgraph Enablement
-        Y[Auth & Policy<br/>(API Keys / OIDC)]
-        Z[Observability<br/>(OTel · Prometheus)]
+        Y["Auth & Policy\n(API Keys / OIDC)"]
+        Z["Observability\n(OTel · Prometheus)"]
         AA[Config & Feature Flags]
-        AB[Offline Assets<br/>(proj.db · models)]
+        AB["Offline Assets\n(proj.db · models)"]
     end
 
     A --> E
