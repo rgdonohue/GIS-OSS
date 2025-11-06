@@ -140,6 +140,29 @@
 - [ ] Provide ArcGIS Pro toolbox template (ArcPy) hooking into `/query`
 - [ ] Build Jupyter magic commands (`%gis_oss` / `%%gis_oss`) for data scientists
 
+## Week 8: Model Training Foundations
+
+### Data Curation & Annotation
+- [ ] Draft dataset acquisition plan (PostGIS docs, municipal corpora, ESRI translations)
+- [ ] Build scraper/notebook for PostGIS documentation extraction
+- [ ] Collect 100 municipal planning queries + annotate intents/domains
+- [ ] Curate ESRI ModelBuilder → PostGIS SQL mapping examples
+- [ ] Define annotation schema (intent, tools, narrative) in docs/model_training.md
+- [ ] Evaluate labeling tools (Label Studio, Prodigy, custom Streamlit)
+
+### Fine-Tuning Experiments
+- [ ] Prepare LoRA config templates for router, SQL, report tiers
+- [ ] Run pilot router fine-tune (500 examples) and report accuracy/F1
+- [ ] Create SQL evaluation harness (execute generated SQL against sample DB)
+- [ ] Assemble narrative evaluation rubric (tone, completeness, citations)
+- [ ] Document experiment tracking approach (Weights & Biases/MLflow)
+
+### Serving Strategy
+- [ ] Prototype multi-model routing (router + SQL generator) using vLLM or FastAPI middleware
+- [ ] Define model versioning metadata in API responses
+- [ ] Plan adapter storage/deployment layout (`models/finetuned/<tier>/<version>`)
+- [ ] Document fallback escalation flow when router confidence is low
+
 ### Playground & Integrations
 - [ ] Build MapLibre web sandbox with NL query panel and tile overlays
 - [ ] Provide QGIS plugin template consuming the API
