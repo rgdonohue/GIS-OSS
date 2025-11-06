@@ -12,14 +12,14 @@
 - [x] Write setup_dev.sh script for one-command initialization
 
 ### Day 3-4: Spatial Functions
-- [ ] Create src/spatial/postgis_ops.py with 5 core functions:
-  - [ ] buffer_geometry(geom, distance, units)
-  - [ ] calculate_area(geom, units)
-  - [ ] find_intersections(geom1, geom2)
-  - [ ] nearest_neighbors(geom, table, limit)
-  - [ ] transform_crs(geom, from_epsg, to_epsg)
-- [ ] Add input validation for each function
-- [ ] Write pytest tests for each function
+- [x] Create src/spatial/postgis_ops.py with 5 core functions:
+  - [x] buffer_geometry(geom, distance, units)
+  - [x] calculate_area(geom, units)
+  - [x] find_intersections(geom1, geom2)
+  - [x] nearest_neighbors(geom, table, limit)
+  - [x] transform_crs(geom, from_epsg, to_epsg)
+- [x] Add input validation for each function
+- [x] Write pytest tests for each function
 
 ### Day 5: Data Loading
 - [ ] Create scripts/load_sample_data.py
@@ -31,11 +31,11 @@
 ## Week 2: API and Basic LLM
 
 ### Day 6-7: FastAPI Setup
-- [ ] Create src/api/main.py with basic app structure
-- [ ] Add /health and /ready endpoints
-- [ ] Create /query endpoint (stub, returns mock data)
-- [ ] Add request/response models with Pydantic
-- [ ] Set up structured logging
+- [x] Create src/api/main.py with basic app structure
+- [x] Add /health and /ready endpoints
+- [x] Create /query endpoint (stub, returns mock data)
+- [x] Add request/response models with Pydantic
+- [x] Set up structured logging
 
 ### Day 8-9: Model Integration
 - [ ] Document model selection rationale (Qwen vs Llama)
