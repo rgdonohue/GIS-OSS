@@ -118,6 +118,27 @@
 - [ ] Prototype Timescale continuous aggregate for change detection
 - [ ] Evaluate Apache Sedona Spark job for bulk raster/vector processing
 
+## Week 7: Developer Experience
+
+### API Documentation & Contracts
+- [ ] Generate OpenAPI 3.1 spec from FastAPI (`python -m core.api export-openapi`)
+- [ ] Publish Redoc/Swagger UI under `docs/site/`
+- [ ] Establish versioning strategy and changelog (docs/CHANGELOG.md)
+- [ ] Add contract tests ensuring SDK compatibility
+
+### SDK & Client Tooling
+- [ ] Scaffold Python package `sdk/python/gis_oss`
+- [ ] Implement `SpatialAssistant` with typed request/response models
+- [ ] Add async client + retry/backoff utilities
+- [ ] Publish initial package to internal index (or TestPyPI)
+- [ ] Draft CLI wrapper for batch queries
+
+### Playground & Integrations
+- [ ] Build MapLibre web sandbox with NL query panel and tile overlays
+- [ ] Provide QGIS plugin template consuming the API
+- [ ] Author ArcGIS Pro Python toolbox example
+- [ ] Document integration patterns in `docs/integration.md`
+
 ## Prioritization Notes
 
 **Must Have (Week 1)**:
@@ -149,6 +170,11 @@
 - Batch orchestration (Airflow + dbt)
 - Streaming ingest demo (Kafka + Kestra)
 - Sedona evaluation for scale-out workloads
+
+**Week 7 (Developer Experience)**:
+- OpenAPI + documentation portal live
+- Python SDK + CLI published
+- Playground + integration templates available
 
 **Defer to Phase 2**:
 - OAuth/OIDC integration

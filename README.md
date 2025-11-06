@@ -115,6 +115,24 @@ The system recognizes these spatial analysis patterns:
 - Positions the services team to upsell managed deployments (Kubernetes profile, audit automation, carbon reporting).
 - Creates a reference architecture that doubles as marketing collateral for modernization engagements.
 
+## Developer Experience
+- OpenAPI 3.1 spec + Redoc portal generated from the FastAPI service.
+- Typed Python SDK (`gis-oss-sdk`) with sync/async clients and Pydantic models.
+- MapLibre playground for composing queries, visualizing tiles, and exporting cURL/Python snippets.
+- Integration guides for ArcGIS Pro, QGIS, and workflow orchestrators (Airflow/Kestra/FME).
+- See `docs/developer_experience.md` for the full DevEx roadmap.
+
+```python
+from gis_oss import SpatialAssistant
+
+assistant = SpatialAssistant(base_url="http://localhost:8000", api_key="dev-key")
+result = assistant.query(
+    "Find parcels within 500ft of schools",
+    return_format="geojson",
+    include_confidence=True,
+)
+```
+
 ## Getting Started (Developers)
 1. Install Docker & Docker Compose (v2+).
 2. Clone this repository and copy `.env.example` to `.env` with local credentials.
