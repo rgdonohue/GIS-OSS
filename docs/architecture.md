@@ -2,7 +2,7 @@
 
 ## Overview
 
-GIS-OSS is a privacy-focused geospatial intelligence system that uses open-weight language models to orchestrate spatial data pipelines. The system prioritizes data sovereignty, deterministic spatial operations, and clear audit trails.
+GIS-OSS is a privacy-focused geospatial intelligence system that uses open-weight language models to orchestrate spatial data pipelines. The system prioritizes data sovereignty, deterministic spatial operations, and clear audit trails. See `docs/tribal_environmental.md` for the tribal environmental stewardship use-case focus that drives the requirements below.
 
 ## Design Principles
 
@@ -113,6 +113,7 @@ graph TD
 - **Narrative/Report Writer**: Mid-tier model (13–20B) crafts summaries, action plans, and structured outputs for planners.
 - **Fallback Generalist**: Larger reasoning model (20B+) handles edge cases or escalated queries when the specialized stack fails.
 - **Confidence & Routing**: Router returns per-intent confidence; low confidence triggers deterministic fallback templates.
+- **Consent Awareness**: Router attaches consent context (user role, elder approval status) to downstream tool calls and refuses when protocol requirements are not met.
 
 ### LLM Service
 - **Model Tiers**:
@@ -132,7 +133,8 @@ graph TD
 - **Vector Tiles**: pg_tileserv or martin serving MVT tiles straight from PostGIS, cached via Redis/Varnish for low-latency visualization.
 - **Projection Control**: Auto-detect and transform via EPSG codes with bundled proj.db; CRS choice logged alongside every query.
 - **Validation**: Geometry validity checks and topology cleaning using `ST_IsValidDetail` + `ST_MakeValid`.
-- **Fallback Geocoding**: Local Pelias instance or nominatim-docker.
+- **Fallback Geocoding**: Local Pelias instance or nominatim-docker with tribe-specific gazetteers.
+- **Sacred Geometry Protection**: Redaction utilities apply buffers/generalization + watermarking on export.
 
 ### RAG & Knowledge System
 - **Embedding Model**: BGE-small or all-MiniLM-L6-v2; upgrade path to Instructor-large for domain tuning.
@@ -140,6 +142,7 @@ graph TD
 - **Retrieval**: Hybrid search (spatial + semantic) plus STAC metadata queries for raster provenance.
 - **Caching**: Redis layer for hot embeddings and tile metadata.
 - **Model Prompt Router**: Embedding-based classifier steers responses to Router/SQL/Report models.
+- **Consent Metadata**: CARE/TK labels stored alongside embeddings; query results filtered by user role and consent scope.
 
 ### Data Pipeline & Orchestration
 - **Batch ETL**: Apache Airflow orchestrates nightly/weekly loads (COG generation, STAC catalog refreshes, pg_tileserv materialized views).
@@ -147,6 +150,7 @@ graph TD
 - **Event-Driven Workflows**: Kestra handles reactive pipelines (e.g., ingesting incoming sensor feeds, triggering re-tiling).
 - **Distributed Processing**: Apache Sedona (Spark) for large-scale raster/vector processing when datasets exceed single-node capacity.
 - **Streaming Ingestion**: Kafka/Redpanda topics capture IoT/telemetry; ksqlDB or Materialize create real-time aggregates surfaced through the LLM tools.
+- **Governance Hooks**: Pipelines enforce consent checks, TEK licensing, and elder approval notifications before publishing outputs.
 
 ## Data Flow
 
@@ -189,6 +193,7 @@ graph TD
 - **Models**: Pre-downloaded to ./models/ directory
 - **Base Maps**: Local MBTiles or PMTiles for visualization
 - **Preparation**: Run `scripts/prepare_offline.sh` to download all dependencies
+- **Sovereignty Assets**: Bundled consent templates, TEK licenses, and redaction configs for air-gapped enforcement
 
 ### Hybrid Mode
 - Cache external API responses for 7 days

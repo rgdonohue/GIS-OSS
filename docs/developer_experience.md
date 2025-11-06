@@ -28,6 +28,7 @@
 - **Auth**: API keys initially, OIDC in Phase 2; SDK handles token refresh and retries.
 - **Jupyter Integration**: `%gis_oss` line magic and `%%gis_oss` cell magic for querying PostGIS and visualizing results via folium/kepler.gl.
 - **FME Connector**: REST transformer sample project using the OpenAPI spec (custom PythonCaller + HTTPCaller combo).
+- **Consent Helpers**: SDK includes consent context objects (tribal role, elder approval token) and automatic redaction utilities for exports.
 
 ## Playground & Sandbox
 - **Web sandbox**: MapLibre UI with NL query panel, LLM trace viewer, tile overlay selector.

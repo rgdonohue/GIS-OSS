@@ -145,12 +145,12 @@
 ## Week 8: Model Training Foundations
 
 ### Data Curation & Annotation
-- [ ] Draft dataset acquisition plan (PostGIS docs, municipal corpora, ESRI translations)
+- [ ] Draft dataset acquisition plan (PostGIS docs, Tribal climate/water datasets, TEK-safe corpora, ESRI→PostGIS translations)
 - [ ] Build scraper/notebook for PostGIS documentation extraction
-- [ ] Collect 100 municipal planning queries + annotate intents/domains
-- [ ] Curate ESRI ModelBuilder → PostGIS SQL mapping examples
-- [ ] Define annotation schema (intent, tools, narrative) in docs/model_training.md
-- [ ] Evaluate labeling tools (Label Studio, Prodigy, custom Streamlit)
+- [ ] Collect 100 tribal environmental queries + annotate intents/domains/consent tags
+- [ ] Curate ESRI ModelBuilder → PostGIS SQL mapping examples (watershed, habitat, fire)
+- [ ] Define annotation schema (intent, tools, narrative, consent) in docs/model_training.md
+- [ ] Evaluate labeling tools (Label Studio, Prodigy, custom Streamlit) for TEK permissions
 
 ### Fine-Tuning Experiments
 - [ ] Prepare LoRA config templates for router, SQL, report tiers
@@ -164,21 +164,22 @@
 - [ ] Define model versioning metadata in API responses
 - [ ] Plan adapter storage/deployment layout (`models/finetuned/<tier>/<version>`)
 - [ ] Document fallback escalation flow when router confidence is low
-- [ ] Benchmark Phase 1 accuracy against GeoBench + municipal scenario set
+- [ ] Benchmark Phase 1 accuracy against GeoBench + Tribal stewardship scenario set
 
 ## Week 9: Community & Ecosystem
 
 ### Benchmarks & Prompt Library
-- [ ] Design SpatialBench task list (10 initial scenarios) and licensing review
+- [ ] Design SpatialBench-Tribal task list (10 initial scenarios) and licensing review
 - [ ] Build benchmark harness under `benchmarks/spatialbench/` with CI hooks
-- [ ] Publish prompt library structure (`prompts/`) with metadata schema
-- [ ] Seed 25 prompts covering planning, compliance, emergency, utilities
+- [ ] Publish prompt library structure (`prompts/`) with metadata schema (intent, consent, TEK labels)
+- [ ] Seed 25 prompts covering watershed defense, cultural resources, climate/fire, food sovereignty, restoration, EJ grants
 
 ### Partnerships & Outreach
-- [ ] Draft university partnership brief and outreach list
+- [ ] Draft tribal partnership brief (pilot tribe shortlist + value props)
 - [ ] Prepare Docker-based lab kit for academic pilots
 - [ ] Set up community channels (GitHub Discussions, Slack) and contribution guidelines
 - [ ] Outline open-core vs enterprise feature matrix for public roadmap
+- [ ] Create conference engagement calendar (Indigenous Mapping Workshop, NCAI, Native American Fish & Wildlife Society)
 
 ### Playground & Integrations
 - [ ] Build MapLibre web sandbox with NL query panel and tile overlays
