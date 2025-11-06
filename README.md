@@ -41,7 +41,7 @@ GIS-OSS is a **privacy-first geospatial sandbox** we are outlining for collabora
 
 Each workflow combines plain-language prompts with spatial analysis—buffers, joins, change detection—and wraps the results with governance safeguards such as sacred-site redaction, consent tracking, and data repatriation.
 
-## Demo Scenarios We Can Share
+## Demo Scenarios
 1. **Sacred Site Storm** — Hurricane approaching ancestral territory: plan evacuations that honor sacred landscapes and safeguard elders’ housing.
 2. **First Foods Forecast** — Explore climate impacts on traditional harvest areas (berries, salmon, wild rice) using TEK calendars and satellite data.
 3. **Treaty Defense Dashboard** — Monitor upstream permits and water withdrawals affecting treaty-protected fisheries, then assemble a defense brief with citations.
