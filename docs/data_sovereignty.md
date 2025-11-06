@@ -1,7 +1,6 @@
 # Indigenous Data Sovereignty Framework
 
-This document translates the review committee’s feedback into concrete requirements for GIS-OSS. The goal is to ensure the
-platform embodies “GIS by and with Tribes,” respecting both legal sovereignty and cultural protocols.
+This note pulls together what we heard from the review committee. It’s here to keep GIS-OSS grounded in “GIS by and with Tribes,” honoring sovereign rights and cultural protocols at every step.
 
 ## Sovereignty vs. Privacy
 - **Privacy** focuses on individual protection (PII, confidentiality).
@@ -72,11 +71,11 @@ controls:
   2. Return all derived outputs (models, reports) to tribe.
   3. Document deletion in audit ledger with council confirmation.
 
-## Implementation Priorities
-1. **Consent Engine** (Week 3–4 tasks): JSON schemas capturing seasonal/role/purpose constraints, API middleware enforcing them.
-2. **Classification Metadata** (Week 4): Extend STAC/metadata models with classification + consent status.
-3. **Audit Enhancements** (Week 3): Log cultural context (purpose, consent token, elder approval ID).
-4. **Toolkit Support**: SDK functions for injecting consent context (`with_consent(role="elder", purpose="ceremony")`) and for redacting exports.
-5. **User Management**: Integrate with tribal identity systems or create lightweight roster capturing traditional roles.
+## Where To Start
+1. **Consent engine** — capture seasonal/role/purpose rules in JSON, enforce them in middleware, and return clear messages when access is paused.
+2. **Classification metadata** — extend STAC/metadata models with classification + consent status so downstream tools stay aware.
+3. **Audit enhancements** — add purpose, consent token, elder approval ID (when applicable) to every log entry.
+4. **Toolkit support** — include SDK helpers like `with_consent(role="elder", purpose="ceremony")` and redaction utilities for exports.
+5. **User management** — connect to tribal identity systems or store traditional roles locally so the consent engine has context.
 
 Refer to `docs/community_process.md` and `docs/legal_architecture.md` for partner engagement and legal structures that wrap these technical requirements.

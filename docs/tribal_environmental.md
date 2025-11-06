@@ -3,7 +3,7 @@
 This document captures the domain focus, exemplar workflows, data requirements, and success metrics that steer GIS-OSS toward
 serving Tribal Nations and Indigenous-led environmental teams.
 
-## Strategic Pillars
+## Focus Areas
 
 1. **Watershed & Water Rights Defense**
    - Streamflow analysis with treaty-overlay logic (historic rights, adjudication boundaries).
@@ -14,7 +14,7 @@ serving Tribal Nations and Indigenous-led environmental teams.
    - **Prompts**: “Find upstream permits affecting our fisheries,” “Generate water-rights defense brief with historical use stats.”
 
 2. **Cultural Resource & Species Co-Management**
-   - Dual knowledge system: TEK observations with role-based access; scientific monitoring (USFWS, NOAA, GBIF).
+   - Bring TEK observations together with scientific monitoring (USFWS, NOAA, GBIF) while honoring access protocols.
    - Phenology tracking for first foods and medicinal plants.
    - Wildlife corridor analysis using telemetry + habitat layers.
    - Elders approval workflow before sharing sensitive data.
@@ -22,11 +22,11 @@ serving Tribal Nations and Indigenous-led environmental teams.
    - **Prompts**: “Track flowering times of traditional medicine plants vs 30-year average,” “Map overlap between elk habitat and traditional hunting grounds.”
 
 3. **Climate Adaptation & Fire Stewardship**
-   - Traditional burning calendars + LANDFIRE fuel models.
-  - Evacuation routing prioritizing elder housing, cultural centers.
+   - Traditional burning calendars paired with LANDFIRE fuel models.
+  - Evacuation routing that puts elders, cultural centers, and clinics first.
   - Smoke impact modeling on ceremonial dates (tribal weather stations).
-  - Post-fire restoration targeting with TEK species preferences.
-  - Integration with FEMA, USDA hazard mitigation programs.
+  - Post-fire restoration planning shaped by TEK species preferences.
+  - Coordination with FEMA and USDA hazard mitigation programs when needed.
   - **Prompts**: “Identify areas needing prescribed burns without impacting sage grouse leks,” “Find post-fire restoration sites suitable for traditional seeds.”
 
 4. **Food Sovereignty & Agricultural Planning**

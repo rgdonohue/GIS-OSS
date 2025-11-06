@@ -1,12 +1,11 @@
 # GIS-OSS — Tribal Environmental Stewardship Copilot
 
-GIS-OSS is a privacy-first **geospatial intelligence sandbox** designed with Tribal Nations and Indigenous-led organizations in
-mind. It shortens watershed analysis, cultural resource protection, climate adaptation planning, and grant preparation from
-weeks to hours—often minutes—while keeping sacred sites and Traditional Ecological Knowledge (TEK) under tribal control.
-Open-weight language models (Qwen 2.5, Llama 3.1, or similar) orchestrate deterministic PostGIS/GDAL tooling so every map,
-statistic, and report is auditable and sovereignty-respecting. The stack ships with Docker-based infrastructure, offline-ready
-datasets, and tribal-specific governance features—consent protocols, elder approval workflows, audit trails—that align with
-Indigenous Data Sovereignty principles.
+GIS-OSS is a privacy-first geospatial sandbox shaped together with Tribal Nations and Indigenous-led organizations. It shortens
+watershed analysis, cultural resource protection, climate adaptation planning, and grant preparation from weeks to hours—often
+minutes—while keeping sacred sites and Traditional Ecological Knowledge (TEK) under tribal control. Open-weight language models
+work alongside trusted PostGIS/GDAL tools so maps, statistics, and reports stay auditable and sovereignty-respecting. The stack
+ships with Docker-based infrastructure, offline-ready datasets, and tribal-specific governance features—consent protocols,
+elder approval workflows, audit trails—aligned with Indigenous Data Sovereignty principles.
 
 ![GIS OSS image](gis-oss.png)
 
@@ -14,7 +13,7 @@ Indigenous Data Sovereignty principles.
 - Amplifies tribal environmental stewardship with on-prem, privacy-preserving AI tooling.
 - Orchestrates deterministic PostGIS/GDAL workflows so TEK and cultural layers remain protected.
 - Targets tribal GIS teams, environmental departments, and co-management partners who require data residency, consent-driven access, and reproducible analytics.
-- Delivers training playbooks, demo scripts, and funding-ready outputs for watershed, habitat, climate, and restoration projects.
+- Offers practical training materials, demo scripts, and funding-ready outputs for watershed, habitat, climate, and restoration projects.
 
 ## Project Map
 - [Architecture Overview](docs/architecture.md) — system layers, governance hooks, data/ops components.
@@ -29,7 +28,7 @@ Indigenous Data Sovereignty principles.
 - **Open-weight models** (Qwen 2.5, Llama 3.1) enable self-hosted reasoning that respects tribal data sovereignty.
 - **Funding tailwinds**: BIL/IRA, EPA, BIA, and DOJ grants prioritize tribal climate resilience, habitat restoration, and environmental justice.
 - **Data sovereignty mandate**: TEK and sacred site data cannot leave tribal custody; GIS-OSS keeps every inference, cache, and audit trail inside the firewall.
-- **Measured impact**: early prototypes show 5–10× faster cultural review packets, water-quality reports, and treaty defense briefs—each with full citation trails and redaction controls.
+- **Measured impact**: early prototypes helped environmental staff finish cultural review packets, water-quality reports, and treaty defense briefs in a fraction of the time, all with citation trails and redaction controls.
 
 ## Core Tribal Environmental Workflows
 - **Watershed & Water Rights Defense**  
@@ -45,18 +44,18 @@ Indigenous Data Sovereignty principles.
 - **Environmental Justice & Grant Intelligence**  
   Auto-generated maps/stats for EPA/BIA grants, cumulative impact assessments, climate vulnerability indexing, community health overlays, evidence packs for “data-to-grant” workflows.
 
-Each workflow blends NL→SQL translation, spatial joins, change detection, and templated narratives while enforcing data governance rules (sacred-site redaction, consent tracking, data-repatriation guarantees).
+Each workflow combines plain-language prompts with spatial analysis—buffers, joins, change detection—and wraps the results with governance safeguards such as sacred-site redaction, consent tracking, and data repatriation.
 
-## Killer Demo Scenarios
-1. **Sacred Site Storm** — Hurricane approaching ancestral territory: produce an evacuation plan that reroutes around sacred landscapes and protects elders’ housing.
-2. **First Foods Forecast** — Model climate impacts on traditional harvest areas (berries, salmon, wild rice) across 20-year horizons with TEK calendars.
-3. **Treaty Defense Dashboard** — Monitor upstream industrial permits and water withdrawals affecting treaty-protected fisheries, auto-generate defense briefs with citations.
-4. **Grant Writing Wizard** — Input an environmental challenge; output maps, statistics, and narratives tailored to EPA/BIA/USDA grant templates.
+## Demo Scenarios We Can Share
+1. **Sacred Site Storm** — Hurricane approaching ancestral territory: plan evacuations that honor sacred landscapes and safeguard elders’ housing.
+2. **First Foods Forecast** — Explore climate impacts on traditional harvest areas (berries, salmon, wild rice) using TEK calendars and satellite data.
+3. **Treaty Defense Dashboard** — Monitor upstream permits and water withdrawals affecting treaty-protected fisheries, then assemble a defense brief with citations.
+4. **Grant Support Toolkit** — Start with a local environmental concern and build maps, statistics, and narratives ready for EPA/BIA/USDA submissions.
 
 ## Value for Tribal Partners & Enablement Teams
 - Let environmental staff cut cultural resource reviews from multi-day manual GIS work to <30 minutes while retaining full control over sacred data.
 - Package reusable lesson plans: each prompt maps a tribal policy question (“Are treaty-protected fisheries at risk?”) to a map, report, and citation trail ready for council or agency submission.
-- Equip services teams with concrete ROI stories—EPA Environmental Justice grants won, acres restored, carbon credits quantified, youth engaged in mapping programs.
+- Share stories that matter—EPA Environmental Justice grants secured, acres restored, carbon credits documented, youth engaged in mapping programs.
 - Provide an on-prem reference stack tribal IT can deploy in a day, with elder approval workflows, audit logging, and “data comes home” policies baked in.
 
 ## Data Sovereignty Features
