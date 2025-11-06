@@ -66,9 +66,18 @@ GIS-OSS is a privacy-focused geospatial intelligence system that uses open-weigh
 - Extracts spatial intent (buffer, intersect, nearest, etc.)
 - Identifies referenced entities and parameters
 - Routes to appropriate execution path
+- **Router Model**: Lightweight 3B-class LLM classifies user intent, chooses tool chains, and sets reasoning effort.
+- **SQL/Tool Generator**: Fine-tuned CodeLlama/PostGIS model generates deterministic SQL and tool parameters.
+- **Narrative/Report Writer**: Mid-tier model (13–20B) crafts summaries, action plans, and structured outputs for planners.
+- **Fallback Generalist**: Larger reasoning model (20B+) handles edge cases or escalated queries when the specialized stack fails.
+- **Confidence & Routing**: Router returns per-intent confidence; low confidence triggers deterministic fallback templates.
 
 ### LLM Service
-- **Model**: Qwen 2.5 7B (dev) / 32B (production)
+- **Model Tiers**:
+  - Router: 3B instruction-tuned model (e.g., distilled Qwen 3B) for intent classification and policy checks.
+  - SQL Generator: CodeLlama/PostGIS fine-tune for NL→SQL and tool parameterization.
+  - Report Writer: Qwen 2.5 7B/14B or Llama 3.1 8B with retrieval context for narrative outputs.
+  - Fallback: Qwen 2.5 32B or Llama 3.1 70B for complex reasoning/escalations.
 - **Serving**: vLLM with INT8 quantization
 - **Context**: 32,768 tokens (Qwen 2.5 native support)
 - **Effective Context**: ~16k tokens after tool schemas and system prompt
@@ -88,6 +97,7 @@ GIS-OSS is a privacy-focused geospatial intelligence system that uses open-weigh
 - **Vector Store**: pgvector with HNSW indexing; Timescale continuous aggregates expose temporal context windows.
 - **Retrieval**: Hybrid search (spatial + semantic) plus STAC metadata queries for raster provenance.
 - **Caching**: Redis layer for hot embeddings and tile metadata.
+- **Model Prompt Router**: Embedding-based classifier steers responses to Router/SQL/Report models.
 
 ### Data Pipeline & Orchestration
 - **Batch ETL**: Apache Airflow orchestrates nightly/weekly loads (COG generation, STAC catalog refreshes, pg_tileserv materialized views).
@@ -149,6 +159,7 @@ GIS-OSS is a privacy-focused geospatial intelligence system that uses open-weigh
 - Single machine deployment
 - All services in containers
 - Shared volume for data
+- Optional adapters: QGIS plugin dev mode, Jupyter notebook environment with magic commands, mock OpenAPI validation server.
 
 ### Production (Kubernetes)
 - Horizontal scaling for API/LLM
@@ -158,6 +169,7 @@ GIS-OSS is a privacy-focused geospatial intelligence system that uses open-weigh
 - TiTiler deployment for COG tiles
 - Airflow/Kestra namespaces for orchestration
 - Distributed object storage (MinIO/S3 compatible) for COG/STAC/PMTiles
+- Integration services: API gateway exposing OpenAPI docs, FME Server webhook endpoints, managed JupyterHub for data science teams.
 
 ### Edge (Embedded)
 - SQLite with SpatiaLite

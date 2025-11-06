@@ -26,18 +26,22 @@
 - **JavaScript**: Lightweight client for browser apps (MapLibre integration, token management).
 - **CLI**: `gis-oss` command for scripting (CSV/GeoJSON output, batch jobs).
 - **Auth**: API keys initially, OIDC in Phase 2; SDK handles token refresh and retries.
+- **Jupyter Integration**: `%gis_oss` line magic and `%%gis_oss` cell magic for querying PostGIS and visualizing results via folium/kepler.gl.
+- **FME Connector**: REST transformer sample project using the OpenAPI spec (custom PythonCaller + HTTPCaller combo).
 
 ## Playground & Sandbox
 - **Web sandbox**: MapLibre UI with NL query panel, LLM trace viewer, tile overlay selector.
 - **Notebook kits**: Jupyter templates (`notebooks/`) invoking the SDK for workshop exercises.
 - **Sample datasets**: GeoParquet, COG, PMTiles curated in `data/samples/` with licensing metadata.
 - **Scenario bundles**: Ready-to-run demos (e.g., emergency response, urban planning) packaged with instructions.
+- **Enterprise Hooks**: FME Server workspace template, ArcGIS Pro add-in library, and REST connectors with signed requests.
 
 ## Integration Paths
 - **ESRI**: REST connector examples (ArcGIS Pro Python toolbox, Feature Service exports).
 - **QGIS**: Plugin skeleton calling the API/SDK, with offline support via PMTiles.
 - **Workflow engines**: FME/Kestra recipes for ingest and automation.
 - **CI/CD**: GitHub Actions template running lint, tests, dbt, and contract tests against the API.
+- **Data Science**: Jupyter notebooks + papermill pipelines leveraging the SDK for reproducible analyses.
 
 ## Developer Experience Roadmap
 1. Generate initial OpenAPI spec + Redoc documentation.

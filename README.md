@@ -20,8 +20,7 @@ want AI copilots inside ESRI-based environments.
 - **Client pressure**: regulated utilities, cities, and transportation agencies are asking for AI augmentation but require data residency and reproducible workflows.
 - **Modernization gap**: most ESRI-based organizations lack a controlled environment to experiment with NL→GIS automation; we can supply both the platform and the enablement content.
 
-## Solution Snapshot
-- **LLM as orchestrator**: natural-language parsing and task planning only; spatial math delegated to trusted engines.
+- **LLM as orchestrator**: multi-model tier with a 3B router, CodeLlama/PostGIS SQL generator, 7–20B report writer, and 32B+ fallback to keep reasoning accurate and cost-effective.
 - **Deterministic spatial core**: PostGIS 3.4 + TimescaleDB for space-time analytics, GDAL/rasterio and TiTiler for COG rasters, pg_tileserv/martin for vector tiles, pgvector for semantic search.
 - **Governance built-in**: license-aware STAC catalog, audit logging, optional carbon tracking, and scripted dual-publishing workflows.
 - **Modern pipeline**: Airflow + dbt for batch ETL, Kestra for event-driven flows, Apache Sedona for distributed crunching, Kafka/Redpanda for streaming ingest.
@@ -116,10 +115,11 @@ The system recognizes these spatial analysis patterns:
 - Creates a reference architecture that doubles as marketing collateral for modernization engagements.
 
 ## Developer Experience
-- OpenAPI 3.1 spec + Redoc portal generated from the FastAPI service.
+- OpenAPI 3.1 spec + Redoc portal generated from the FastAPI service (targeting `/docs/openapi.yaml`).
 - Typed Python SDK (`gis-oss-sdk`) with sync/async clients and Pydantic models.
 - MapLibre playground for composing queries, visualizing tiles, and exporting cURL/Python snippets.
-- Integration guides for ArcGIS Pro, QGIS, and workflow orchestrators (Airflow/Kestra/FME).
+- QGIS plugin template, ArcGIS Pro Python toolbox, and FME Server connector for enterprise workflows.
+- Jupyter “magic” commands (`%%gis_oss`) for rapid spatial prototyping in notebooks.
 - See `docs/developer_experience.md` for the full DevEx roadmap.
 
 ```python
@@ -153,6 +153,7 @@ result = assistant.query(
 - **Streaming**: Kafka/Redpanda topics for IoT feeds; Kestra triggers downstream processing.
 - **Batch pipeline**: Airflow orchestrates ETL, dbt manages analytical models, Apache Sedona handles large-scale Spark jobs.
 - **Toolchain**: FastAPI + LLM orchestrator + deterministic tooling, surfaced through CLI/Web/API clients.
+- **Integrations**: QGIS plugin, ArcGIS Pro add-in, FME Server webhooks, and Jupyter magic commands ensure humans stay in the loop.
 
 ## Repository Layout
 - `docs/` — Architecture overview, deployment notes (expanding with governance/security playbooks).

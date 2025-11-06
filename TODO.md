@@ -36,6 +36,8 @@
 - [x] Create /query endpoint (stub, returns mock data)
 - [x] Add request/response models with Pydantic
 - [x] Set up structured logging
+- [ ] Export OpenAPI schema (`scripts/export_openapi.py`)
+- [ ] Add swagger/redoc route to serve documentation
 
 ### Day 8-9: Model Integration
 - [ ] Document model selection rationale (Qwen vs Llama)
@@ -125,6 +127,8 @@
 - [ ] Publish Redoc/Swagger UI under `docs/site/`
 - [ ] Establish versioning strategy and changelog (docs/CHANGELOG.md)
 - [ ] Add contract tests ensuring SDK compatibility
+- [ ] Create FME Server workspace template (HTTPCaller + PythonCaller) for GIS-OSS
+- [ ] Publish REST connector guide leveraging OpenAPI spec
 
 ### SDK & Client Tooling
 - [ ] Scaffold Python package `sdk/python/gis_oss`
@@ -132,6 +136,9 @@
 - [ ] Add async client + retry/backoff utilities
 - [ ] Publish initial package to internal index (or TestPyPI)
 - [ ] Draft CLI wrapper for batch queries
+- [ ] Create QGIS plugin skeleton (PyQGIS) with authentication + query UI
+- [ ] Provide ArcGIS Pro toolbox template (ArcPy) hooking into `/query`
+- [ ] Build Jupyter magic commands (`%gis_oss` / `%%gis_oss`) for data scientists
 
 ### Playground & Integrations
 - [ ] Build MapLibre web sandbox with NL query panel and tile overlays
