@@ -105,7 +105,7 @@ graph TD
     subgraph Gateway
         E[FastAPI Gateway]
         F["GraphQL Adapter\n(optional)"]
-        G[Streaming (WebSocket/SSE)]
+        G["Streaming (WebSocket/SSE)"]
     end
 
     subgraph Intelligence
@@ -120,7 +120,7 @@ graph TD
         M[PostGIS + TimescaleDB]
         N[TiTiler / GDAL]
         O[pg_tileserv / martin]
-        P[Apache Sedona (scale-out)]
+        P["Apache Sedona (scale-out)"]
         Q[Airflow · dbt · Kestra]
     end
 
