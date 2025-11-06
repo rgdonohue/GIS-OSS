@@ -1,6 +1,6 @@
 # GIS-OSS — Tribal Environmental Stewardship Copilot
 
-GIS-OSS is a privacy-first geospatial intelligence sandbox designed with Tribal Nations and Indigenous-led organizations in
+GIS-OSS is a privacy-first **geospatial intelligence sandbox** designed with Tribal Nations and Indigenous-led organizations in
 mind. It shortens watershed analysis, cultural resource protection, climate adaptation planning, and grant preparation from
 weeks to hours—often minutes—while keeping sacred sites and Traditional Ecological Knowledge (TEK) under tribal control.
 Open-weight language models (Qwen 2.5, Llama 3.1, or similar) orchestrate deterministic PostGIS/GDAL tooling so every map,
