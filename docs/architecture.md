@@ -222,3 +222,4 @@ GIS-OSS is a privacy-focused geospatial intelligence system that uses open-weigh
 - [ ] Advanced visualization (deck.gl analytics)
 - [ ] GPU-accelerated raster analytics (CUDA-enabled GDAL or rasterframes)
 - [ ] Edge streaming support (MQTT ingestion mapped to Kafka topics)
+- [ ] SpatialBench public benchmark harness + leaderboard integration

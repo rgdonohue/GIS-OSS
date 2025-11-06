@@ -140,6 +140,13 @@ result = assistant.query(
 - **Throughput & Concurrency**: Sustain 3 structured queries per second per GPU today; autoscale to 30 concurrent analysts in Phase 2.
 - **Cost Savings**: 5× reduction in staff hours for permit triage in pilot studies; targeting 10× once structured reports are automated.
 
+## Community & Ecosystem
+- Launch **SpatialBench**—an open GIS benchmark suite blending municipal planning, utilities, and emergency scenarios.
+- Publish a prompt & scenario library (25+ vetted prompts) with notebooks that show expected SQL/tool chains.
+- Partner with urban-planning and environmental science departments to co-develop labs and capstone projects.
+- Keep the core stack Apache-licensed while offering enterprise add-ons (HA tooling, governance, support).
+- See `docs/ecosystem.md` for the detailed community roadmap and success metrics.
+
 ## Getting Started (Developers)
 1. Install Docker & Docker Compose (v2+).
 2. Clone this repository and copy `.env.example` to `.env` with local credentials.
