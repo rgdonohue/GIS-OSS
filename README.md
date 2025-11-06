@@ -198,7 +198,7 @@ graph TD
         M[PostGIS + TimescaleDB]
         N[TiTiler / GDAL]
         O[pg_tileserv / martin]
-        P[Apache Sedona (scale-out)]
+        P["Apache Sedona (scale-out)"]
         Q[Airflow · dbt · Kestra]
     end
 
