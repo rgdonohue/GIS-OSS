@@ -1,8 +1,8 @@
 # Community Governance & Engagement Process
 
 Building GIS-OSS “with and by tribes” demands structured, respectful processes that center community governance, cultural
-protocols, and intergenerational knowledge transfer. This playbook outlines how we collaborate from project initiation through
-long-term stewardship.
+protocols, and intergenerational knowledge transfer. This playbook outlines a proposed collaboration approach—from project
+initiation through long-term stewardship—and will be adjusted in partnership with each tribe we work alongside.
 
 ## Governance Bodies & Roles
 

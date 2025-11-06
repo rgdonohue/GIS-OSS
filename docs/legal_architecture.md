@@ -1,7 +1,6 @@
 # Legal & Jurisdictional Architecture
 
-This document consolidates legal guidance to ensure GIS-OSS complies with tribal, federal, and state obligations while
-preserving Tribal sovereignty and limiting liability.
+This document sketches the legal considerations we need to address so GIS-OSS can comply with tribal, federal, and state obligations while preserving Tribal sovereignty and limiting liability. It is a starting point to discuss with tribal legal teams and will evolve with their direction.
 
 ## Legal Frameworks To Embed
 

@@ -1,7 +1,7 @@
 # Tribal Environmental & Cultural Stewardship Playbook
 
-This document captures the domain focus, exemplar workflows, data requirements, and success metrics that steer GIS-OSS toward
-serving Tribal Nations and Indigenous-led environmental teams.
+This planning document captures proposed focus areas, exemplar workflows, data requirements, and success metrics that will
+guide GIS-OSS as we co-design with Tribal Nations and Indigenous-led environmental teams.
 
 ## Focus Areas
 

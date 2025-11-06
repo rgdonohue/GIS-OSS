@@ -1,19 +1,14 @@
 # GIS-OSS — Tribal Environmental Stewardship Copilot
 
-GIS-OSS is a privacy-first geospatial sandbox shaped together with Tribal Nations and Indigenous-led organizations. It shortens
-watershed analysis, cultural resource protection, climate adaptation planning, and grant preparation from weeks to hours—often
-minutes—while keeping sacred sites and Traditional Ecological Knowledge (TEK) under tribal control. Open-weight language models
-work alongside trusted PostGIS/GDAL tools so maps, statistics, and reports stay auditable and sovereignty-respecting. The stack
-ships with Docker-based infrastructure, offline-ready datasets, and tribal-specific governance features—consent protocols,
-elder approval workflows, audit trails—aligned with Indigenous Data Sovereignty principles.
+GIS-OSS is a **privacy-first geospatial sandbox** we are outlining for collaboration with Tribal Nations and Indigenous-led organizations. The intent is to shorten watershed analysis, cultural resource protection, climate adaptation planning, and grant preparation—without moving sacred sites or Traditional Ecological Knowledge (TEK) outside tribal control. The design uses open-weight language models alongside trusted PostGIS/GDAL tools so maps, statistics, and reports remain auditable and sovereignty-respecting. Everything described here is meant to ship as Docker-based infrastructure, offline-ready datasets, and tribal-specific governance features—consent protocols, elder approval workflows, audit trails—once they are co-developed and ratified with tribal partners.
 
 ![GIS OSS image](gis-oss.png)
 
 ## Executive Overview
-- Amplifies tribal environmental stewardship with on-prem, privacy-preserving AI tooling.
-- Orchestrates deterministic PostGIS/GDAL workflows so TEK and cultural layers remain protected.
-- Targets tribal GIS teams, environmental departments, and co-management partners who require data residency, consent-driven access, and reproducible analytics.
-- Offers practical training materials, demo scripts, and funding-ready outputs for watershed, habitat, climate, and restoration projects.
+- Aims to amplify tribal environmental stewardship with on-prem, privacy-preserving tooling.
+- Keeps deterministic PostGIS/GDAL workflows central so TEK and cultural layers remain protected.
+- Intends to serve tribal GIS teams, environmental departments, and co-management partners who require data residency, consent-driven access, and reproducible analytics.
+- Plans to provide practical training materials, demo scripts, and funding-ready outputs for watershed, habitat, climate, and restoration projects once co-developed and approved.
 
 ## Project Map
 - [Architecture Overview](docs/architecture.md) — system layers, governance hooks, data/ops components.
@@ -28,7 +23,7 @@ elder approval workflows, audit trails—aligned with Indigenous Data Sovereignt
 - **Open-weight models** (Qwen 2.5, Llama 3.1) enable self-hosted reasoning that respects tribal data sovereignty.
 - **Funding tailwinds**: BIL/IRA, EPA, BIA, and DOJ grants prioritize tribal climate resilience, habitat restoration, and environmental justice.
 - **Data sovereignty mandate**: TEK and sacred site data cannot leave tribal custody; GIS-OSS keeps every inference, cache, and audit trail inside the firewall.
-- **Measured impact**: early prototypes helped environmental staff finish cultural review packets, water-quality reports, and treaty defense briefs in a fraction of the time, all with citation trails and redaction controls.
+- **Intended impact**: help environmental staff finish cultural review packets, water-quality reports, and treaty defense briefs faster, while keeping citation trails and redaction controls under tribal approval.
 
 ## Core Tribal Environmental Workflows
 - **Watershed & Water Rights Defense**  
@@ -58,7 +53,7 @@ Each workflow combines plain-language prompts with spatial analysis—buffers, j
 - Share stories that matter—EPA Environmental Justice grants secured, acres restored, carbon credits documented, youth engaged in mapping programs.
 - Provide an on-prem reference stack tribal IT can deploy in a day, with elder approval workflows, audit logging, and “data comes home” policies baked in.
 
-## Data Sovereignty Features
+## Data Sovereignty Features (in design)
 - Consent-aware data layers (collective consent, elder approval workflows, seasonal access windows).
 - Automatic redaction and watermarking of sacred site geometry in external exports.
 - TEK licensing metadata (Traditional Knowledge labels, CARE principles).
@@ -66,7 +61,7 @@ Each workflow combines plain-language prompts with spatial analysis—buffers, j
 - Offline-first deployment path (local models, proj.db, PMTiles) so air-gapped operations remain viable.
 - See `docs/data_sovereignty.md`, `docs/community_process.md`, and `docs/legal_architecture.md` for governance, consultation, and legal frameworks.
 
-## Developer Experience
+## Developer Experience (planned)
 - OpenAPI 3.1 spec + Redoc portal generated from the FastAPI service (targeting `/docs/openapi.yaml`).
 - Typed Python SDK (`gis-oss-sdk`) with sync/async clients and Pydantic models.
 - MapLibre playground for composing queries, visualizing tiles, and exporting cURL/Python snippets.

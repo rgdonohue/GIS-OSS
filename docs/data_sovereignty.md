@@ -1,6 +1,6 @@
 # Indigenous Data Sovereignty Framework
 
-This note pulls together what we heard from the review committee. It’s here to keep GIS-OSS grounded in “GIS by and with Tribes,” honoring sovereign rights and cultural protocols at every step.
+This note pulls together what we heard from the review committee. It’s a working draft meant to keep GIS-OSS grounded in “GIS by and with Tribes,” honoring sovereign rights and cultural protocols at every step. Every element below will be refined with tribal partners before implementation.
 
 ## Sovereignty vs. Privacy
 - **Privacy** focuses on individual protection (PII, confidentiality).
