@@ -56,6 +56,7 @@ Each workflow blends NL→SQL translation, spatial joins, change detection, and 
 - TEK licensing metadata (Traditional Knowledge labels, CARE principles).
 - Audit ledger capturing who accessed what, under which consent agreement, with cryptographic signing.
 - Offline-first deployment path (local models, proj.db, PMTiles) so air-gapped operations remain viable.
+- See `docs/data_sovereignty.md`, `docs/community_process.md`, and `docs/legal_architecture.md` for governance, consultation, and legal frameworks.
 
 ## Developer Experience
 - OpenAPI 3.1 spec + Redoc portal generated from the FastAPI service (targeting `/docs/openapi.yaml`).
@@ -205,7 +206,7 @@ graph TD
 > Note: Model weights are large (7B–70B parameters). Start with Qwen 2.5 7B (INT8) for development on a single GPU, scaling to 32B/70B models for production accuracy. LoRA adapters for router/SQL/report tiers live under `models/finetuned/`.
 
 ## Repository Layout
-- `docs/` — Architecture overview, tribal environmental strategy, deployment notes.
+- `docs/` — Architecture overview, tribal environmental strategy, data sovereignty, community process, legal architecture, deployment notes.
 - `core/` *(planned)* — FastAPI backend, LLM orchestration, spatial engine modules.
 - `pipeline/` *(planned)* — Airflow DAGs, dbt project, Kestra flows.
 - `web/` *(planned)* — MapLibre-based UI for demos and workshops.
