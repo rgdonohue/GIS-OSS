@@ -16,6 +16,15 @@ Indigenous Data Sovereignty principles.
 - Targets tribal GIS teams, environmental departments, and co-management partners who require data residency, consent-driven access, and reproducible analytics.
 - Delivers training playbooks, demo scripts, and funding-ready outputs for watershed, habitat, climate, and restoration projects.
 
+## Project Map
+- [Architecture Overview](docs/architecture.md) — system layers, governance hooks, data/ops components.
+- [Tribal Environmental Playbook](docs/tribal_environmental.md) — domain pillars, metrics, partner roadmap.
+- [Indigenous Data Sovereignty Framework](docs/data_sovereignty.md) — classifications, consent, repatriation.
+- [Community Governance & Engagement Process](docs/community_process.md) — advisory bodies, workshops, reciprocity.
+- [Legal & Jurisdictional Architecture](docs/legal_architecture.md) — CARE/FPIC enforcement, treaty rights, liability.
+- [Developer Experience Plan](docs/developer_experience.md) — SDKs, QA, integrations.
+- [Backlog & Milestones](TODO.md) — weekly execution plan.
+
 ## Why This Matters Now
 - **Open-weight models** (Qwen 2.5, Llama 3.1) enable self-hosted reasoning that respects tribal data sovereignty.
 - **Funding tailwinds**: BIL/IRA, EPA, BIA, and DOJ grants prioritize tribal climate resilience, habitat restoration, and environmental justice.
