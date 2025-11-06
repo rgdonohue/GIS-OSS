@@ -199,15 +199,21 @@ GIS-OSS is a privacy-focused geospatial intelligence system that uses open-weigh
 
 ## Performance Targets
 
-| Metric | Phase 1 Target | Phase 2 Target | Current |
-|--------|---------------|----------------|---------|
-| Simple query latency | < 3s | < 2s | TBD |
-| Complex query latency | < 15s | < 10s | TBD |
-| Throughput (per GPU) | 2-3 RPS | 5-10 RPS | TBD |
-| Model accuracy | > 70% | > 85% | TBD |
-| Concurrent users | 5 | 25 | TBD |
+| Metric | Phase 1 Target | Phase 2 Target | Measurement Plan |
+|--------|----------------|----------------|------------------|
+| Query latency (p50/p95/p99) | 1.5s / 3.0s / 6.0s for simple ops | 1.0s / 2.0s / 4.0s | Locust stress tests against `/query`, Grafana dashboards |
+| Complex workflows (e.g., buffer → intersect → summarize) | ≤12s p95 end-to-end | ≤8s p95 | Timer instrumentation + integration tests |
+| Accuracy (core GIS operations) | ≥85% vs. human benchmark set | ≥92% | 50-sample GeoBench + custom municipal tasks |
+| Compliance report generation | ≤10 minutes for NEPA/CEQA draft | ≤5 minutes | Scenario-based tests with real datasets |
+| Cost vs manual analysis | 5× faster, 70% lower staff hours | 10× faster, 80% reduction | Time-and-motion study with pilot planners |
+| Supported data volume | 200 GB vectors, 5 TB COG rasters | 1 TB vectors, 20 TB rasters | Load/post benchmarks, tile generation stress tests |
+| Throughput (per GPU) | 3 req/s sustained (router + SQL) | 6 req/s | k6 forecast with vLLM instrumentation |
+| Concurrent users | 10 active sessions | 30 active | Kubernetes load test with autoscaling |
 
-**Note**: Throughput scales linearly with GPU count in production deployment
+**Notes**
+- Latency targets assume PostGIS on NVMe storage and local vector-tile server; remote object stores add 0.5–1.0s.
+- Accuracy baseline derived from municipal QA tasks (buffers, zoning checks, temporal change detection).
+- Cost comparisons to be validated with partner city (baseline: 2-hour manual permit review vs 12-minute assisted flow).
 
 ## Future Enhancements
 

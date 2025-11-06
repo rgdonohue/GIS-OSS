@@ -119,6 +119,7 @@
 - [ ] Configure Kestra flow to react to new events (e.g., sensor updates → rebuffer)
 - [ ] Prototype Timescale continuous aggregate for change detection
 - [ ] Evaluate Apache Sedona Spark job for bulk raster/vector processing
+- [ ] Instrument `/query` latency metrics (p50/p95/p99) via Prometheus + Grafana
 
 ## Week 7: Developer Experience
 
@@ -139,6 +140,7 @@
 - [ ] Create QGIS plugin skeleton (PyQGIS) with authentication + query UI
 - [ ] Provide ArcGIS Pro toolbox template (ArcPy) hooking into `/query`
 - [ ] Build Jupyter magic commands (`%gis_oss` / `%%gis_oss`) for data scientists
+- [ ] Draft performance report template (latency, accuracy, throughput, cost savings)
 
 ## Week 8: Model Training Foundations
 
@@ -162,6 +164,7 @@
 - [ ] Define model versioning metadata in API responses
 - [ ] Plan adapter storage/deployment layout (`models/finetuned/<tier>/<version>`)
 - [ ] Document fallback escalation flow when router confidence is low
+- [ ] Benchmark Phase 1 accuracy against GeoBench + municipal scenario set
 
 ### Playground & Integrations
 - [ ] Build MapLibre web sandbox with NL query panel and tile overlays
