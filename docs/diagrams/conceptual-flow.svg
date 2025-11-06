@@ -58,7 +58,7 @@
   <rect x="580" y="260" width="180" height="90" fill="#fef3c7" stroke="#92400e" class="box"/>
   <text x="670" y="285" text-anchor="middle" class="box-text">Report Generation</text>
   <text x="670" y="310" text-anchor="middle" class="small-text">Maps + narratives</text>
-  <text x="670" y="328" text-anchor="middle" class="small-text">Citations & metadata</text>
+  <text x="670" y="328" text-anchor="middle" class="small-text">Citations &amp; metadata</text>
   <text x="670" y="345" text-anchor="middle" class="small-text">Audit trail created</text>
   
   <!-- Arrow 4 (curved back to left) -->
