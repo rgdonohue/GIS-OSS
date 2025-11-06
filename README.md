@@ -95,87 +95,21 @@ result = assistant.query(
 - **Toolchain**: FastAPI + LLM orchestrator + deterministic PostGIS/GDAL tooling.
 - **Integrations**: QGIS plugin, ArcGIS Pro add-in, FME Server webhooks, Jupyter magics ensure humans stay in the loop.
 
-## Layered Architecture Snapshot
+## Architecture Overview
 
-```mermaid
-graph TD
-    subgraph User
-        A[QGIS Plugin]
-        B[Web UI / MapLibre]
-        C[API Clients]
-        D[Jupyter & CLI]
-    end
+### Conceptual Flow: From Query to Tribal Decision
 
-    subgraph Gateway
-        E[FastAPI Gateway]
-        F["GraphQL Adapter\n(optional)"]
-        G["Streaming (WebSocket/SSE)"]
-    end
+![Conceptual diagram showing the workflow from tribal environmental staff making a query, through governance checks verifying consent and protecting sacred sites, to spatial analysis with PostGIS and LLM, report generation with audit logging, and final delivery ready for tribal council or grant submission](./docs/diagrams/conceptual-flow.svg)
 
-    subgraph Intelligence
-        H[Router LLM]
-        I[SQL Generator]
-        J[Spatial Tool Orchestrator]
-        K[Report Writer]
-        L[(vLLM Serving Pool)]
-    end
+*How GIS-OSS processes queries while enforcing data sovereignty at every step*
 
-    subgraph Execution
-        M[PostGIS + TimescaleDB]
-        N[TiTiler / GDAL]
-        O[pg_tileserv / martin]
-        P["Apache Sedona (scale-out)"]
-        Q[Airflow · dbt · Kestra]
-    end
+### Technical Architecture
 
-    subgraph Data & Governance
-        R[PostgreSQL Schemas]
-        S[pgvector + Redis]
-        T["Object Storage\n(COGs · PMTiles)"]
-        U[STAC Catalog]
-        V[Audit & Attribution Ledger]
-        W[Carbon Metrics]
-        X[Kafka / Redpanda]
-    end
+![Detailed technical architecture diagram showing six layers: User Interfaces (QGIS, Web UI, API clients, Jupyter), Gateway (FastAPI, GraphQL, Streaming), Intelligence (Router LLM, SQL Generator, Spatial Orchestrator, Report Writer, vLLM Pool), Execution (PostGIS, TiTiler, tile servers, Apache Sedona, orchestration), Data & Governance (PostgreSQL, vector stores, object storage, STAC catalog, audit ledger, carbon metrics, event streaming), and Enablement & Ops (Auth/Policy, Observability, Config, Offline Assets)](./docs/diagrams/architecture.svg)
 
-    subgraph Enablement
-        Y["Auth & Policy\n(API Keys / OIDC)"]
-        Z["Observability\n(OTel · Prometheus)"]
-        AA[Config & Feature Flags]
-        AB["Offline Assets\n(proj.db · models)"]
-    end
+*Layered architecture emphasizing governance, auditability, and offline-first operations*
 
-    A --> E
-    B --> E
-    C --> E
-    D --> E
-    E --> H
-    F --> H
-    G --> H
-    H --> I --> J --> K
-    H --- L
-    I --- L
-    K --- L
-    J --> M
-    J --> N
-    J --> O
-    P --> M
-    Q --> M
-    Q --> N
-    Q --> U
-    J --> V
-    E --> V
-    Q --> X
-    M --> R
-    O --> S
-    N --> T
-    Y --> E
-    Z --> E
-    Z --> H
-    Z --> M
-    AB --> R
-    AB --> T
-```
+📝 **[View/Edit Diagrams](./docs/diagrams/)** — Source files and rendering instructions for contributors
 
 ### Layer Responsibilities
 

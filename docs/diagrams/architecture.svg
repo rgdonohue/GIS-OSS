@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="800" fill="#0f172a"/>
+  <text x="600" y="380" font-family="system-ui, sans-serif" font-size="24" text-anchor="middle" fill="#e2e8f0">
+    Technical Architecture Diagram
+  </text>
+  <text x="600" y="420" font-family="system-ui, sans-serif" font-size="16" text-anchor="middle" fill="#94a3b8">
+    To render this diagram, run:
+  </text>
+  <text x="600" y="450" font-family="monospace" font-size="14" text-anchor="middle" fill="#cbd5e1">
+    bash scripts/render_diagrams.sh
+  </text>
+  <text x="600" y="480" font-family="system-ui, sans-serif" font-size="14" text-anchor="middle" fill="#94a3b8">
+    (Requires D2: https://d2lang.com/tour/install)
+  </text>
+</svg>
+

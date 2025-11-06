@@ -1,0 +1,60 @@
+name: Render D2 Diagrams
+
+on:
+  push:
+    paths:
+      - 'docs/diagrams/*.d2'
+      - '.github/workflows/render-diagrams.yml'
+  pull_request:
+    paths:
+      - 'docs/diagrams/*.d2'
+
+jobs:
+  render:
+    name: Render D2 to SVG
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Install D2
+        run: |
+          curl -fsSL https://d2lang.com/install.sh | sh -s --
+          sudo mv ./bin/d2 /usr/local/bin/
+          d2 --version
+      
+      - name: Render diagrams
+        run: |
+          echo "🎨 Rendering architecture diagrams..."
+          
+          # Render main architecture diagram
+          d2 docs/diagrams/architecture.d2 docs/diagrams/architecture.svg \
+            --theme=200 \
+            --dark-theme=200 \
+            --pad=40 \
+            --sketch=false
+          
+          # Render dark mode version
+          d2 docs/diagrams/architecture.d2 docs/diagrams/architecture-dark.svg \
+            --theme=200 \
+            --dark-theme=200 \
+            --pad=40 \
+            --sketch=false
+          
+          echo "✅ Diagrams rendered successfully"
+      
+      - name: Commit rendered SVGs
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs: auto-render D2 diagrams [skip ci]"
+          file_pattern: "docs/diagrams/*.svg"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "github-actions[bot]@users.noreply.github.com"
+          skip_dirty_check: false
+

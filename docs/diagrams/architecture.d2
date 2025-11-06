@@ -1,0 +1,233 @@
+# GIS-OSS Layered Architecture
+# Tribal Environmental Stewardship Platform
+
+direction: right
+
+# User Layer
+user: {
+  label: "User Interfaces"
+  style.fill: "#1e3a8a"
+  style.stroke: "#3b82f6"
+  
+  qgis: "QGIS Plugin" {
+    shape: rectangle
+    style.fill: "#1e40af"
+  }
+  web: "Web UI\nMapLibre" {
+    shape: rectangle
+    style.fill: "#1e40af"
+  }
+  api: "API Clients" {
+    shape: rectangle
+    style.fill: "#1e40af"
+  }
+  jupyter: "Jupyter & CLI" {
+    shape: rectangle
+    style.fill: "#1e40af"
+  }
+}
+
+# Gateway Layer
+gateway: {
+  label: "Gateway"
+  style.fill: "#4c1d95"
+  style.stroke: "#8b5cf6"
+  
+  fastapi: "FastAPI\nGateway" {
+    shape: rectangle
+    style.fill: "#5b21b6"
+  }
+  graphql: "GraphQL Adapter\n(optional)" {
+    shape: rectangle
+    style.fill: "#5b21b6"
+  }
+  streaming: "Streaming\nWebSocket/SSE" {
+    shape: rectangle
+    style.fill: "#5b21b6"
+  }
+}
+
+# Intelligence Layer
+intelligence: {
+  label: "Intelligence"
+  style.fill: "#064e3b"
+  style.stroke: "#10b981"
+  
+  router: "Router LLM" {
+    shape: rectangle
+    style.fill: "#065f46"
+  }
+  sql: "SQL Generator" {
+    shape: rectangle
+    style.fill: "#065f46"
+  }
+  orchestrator: "Spatial Tool\nOrchestrator" {
+    shape: rectangle
+    style.fill: "#065f46"
+  }
+  writer: "Report Writer" {
+    shape: rectangle
+    style.fill: "#065f46"
+  }
+  vllm: "vLLM\nServing Pool" {
+    shape: cylinder
+    style.fill: "#047857"
+  }
+}
+
+# Execution Layer
+execution: {
+  label: "Execution"
+  style.fill: "#7c2d12"
+  style.stroke: "#f97316"
+  
+  postgis: "PostGIS +\nTimescaleDB" {
+    shape: rectangle
+    style.fill: "#9a3412"
+  }
+  titiler: "TiTiler / GDAL" {
+    shape: rectangle
+    style.fill: "#9a3412"
+  }
+  tileserv: "pg_tileserv\nmartin" {
+    shape: rectangle
+    style.fill: "#9a3412"
+  }
+  sedona: "Apache Sedona\n(scale-out)" {
+    shape: rectangle
+    style.fill: "#9a3412"
+  }
+  pipeline: "Airflow · dbt\nKestra" {
+    shape: rectangle
+    style.fill: "#9a3412"
+  }
+}
+
+# Data & Governance Layer
+data: {
+  label: "Data & Governance"
+  style.fill: "#422006"
+  style.stroke: "#fbbf24"
+  
+  schemas: "PostgreSQL\nSchemas" {
+    shape: rectangle
+    style.fill: "#78350f"
+  }
+  vector: "pgvector +\nRedis" {
+    shape: rectangle
+    style.fill: "#78350f"
+  }
+  storage: "Object Storage\nCOGs · PMTiles" {
+    shape: rectangle
+    style.fill: "#78350f"
+  }
+  stac: "STAC Catalog" {
+    shape: rectangle
+    style.fill: "#78350f"
+  }
+  audit: "Audit &\nAttribution Ledger" {
+    shape: rectangle
+    style.fill: "#78350f"
+    style.stroke: "#22c55e"
+    style.stroke-width: 3
+  }
+  carbon: "Carbon Metrics" {
+    shape: rectangle
+    style.fill: "#78350f"
+  }
+  kafka: "Kafka / Redpanda" {
+    shape: rectangle
+    style.fill: "#78350f"
+  }
+}
+
+# Enablement & Ops Layer
+enablement: {
+  label: "Enablement & Ops"
+  style.fill: "#1e293b"
+  style.stroke: "#94a3b8"
+  
+  auth: "Auth & Policy\nAPI Keys / OIDC" {
+    shape: rectangle
+    style.fill: "#334155"
+  }
+  observability: "Observability\nOTel · Prometheus" {
+    shape: rectangle
+    style.fill: "#334155"
+  }
+  config: "Config &\nFeature Flags" {
+    shape: rectangle
+    style.fill: "#334155"
+  }
+  offline: "Offline Assets\nproj.db · models" {
+    shape: rectangle
+    style.fill: "#334155"
+  }
+}
+
+# Connections - User to Gateway
+user.qgis -> gateway.fastapi: {style.stroke: "#60a5fa"}
+user.web -> gateway.fastapi: {style.stroke: "#60a5fa"}
+user.api -> gateway.fastapi: {style.stroke: "#60a5fa"}
+user.jupyter -> gateway.fastapi: {style.stroke: "#60a5fa"}
+
+# Connections - Gateway to Intelligence
+gateway.fastapi -> intelligence.router: {style.stroke: "#a78bfa"}
+gateway.graphql -> intelligence.router: {style.stroke: "#a78bfa"}
+gateway.streaming -> intelligence.router: {style.stroke: "#a78bfa"}
+
+# Connections - Intelligence Layer Internal
+intelligence.router -> intelligence.sql -> intelligence.orchestrator -> intelligence.writer: {
+  style.stroke: "#34d399"
+}
+
+# Connections - Intelligence to vLLM
+intelligence.router -- intelligence.vllm: {style.stroke: "#6ee7b7"; style.stroke-dash: 3}
+intelligence.sql -- intelligence.vllm: {style.stroke: "#6ee7b7"; style.stroke-dash: 3}
+intelligence.writer -- intelligence.vllm: {style.stroke: "#6ee7b7"; style.stroke-dash: 3}
+
+# Connections - Orchestrator to Execution
+intelligence.orchestrator -> execution.postgis: {style.stroke: "#fb923c"}
+intelligence.orchestrator -> execution.titiler: {style.stroke: "#fb923c"}
+intelligence.orchestrator -> execution.tileserv: {style.stroke: "#fb923c"}
+
+# Connections - Pipeline to Execution/Data
+execution.sedona -> execution.postgis: {style.stroke: "#fb923c"}
+execution.pipeline -> execution.postgis: {style.stroke: "#fb923c"}
+execution.pipeline -> execution.titiler: {style.stroke: "#fb923c"}
+execution.pipeline -> data.stac: {style.stroke: "#fbbf24"}
+execution.pipeline -> data.kafka: {style.stroke: "#fbbf24"}
+
+# Connections - Governance/Audit
+intelligence.orchestrator -> data.audit: {
+  style.stroke: "#22c55e"
+  style.stroke-width: 2
+  label: "log access"
+}
+gateway.fastapi -> data.audit: {
+  style.stroke: "#22c55e"
+  style.stroke-width: 2
+  label: "audit trail"
+}
+
+# Connections - Data Layer Internal
+execution.postgis -> data.schemas: {style.stroke: "#fbbf24"}
+execution.tileserv -> data.vector: {style.stroke: "#fbbf24"}
+execution.titiler -> data.storage: {style.stroke: "#fbbf24"}
+
+# Connections - Enablement to Gateway
+enablement.auth -> gateway.fastapi: {
+  style.stroke: "#cbd5e1"
+  label: "enforce policy"
+}
+enablement.observability -> gateway.fastapi: {style.stroke: "#cbd5e1"}
+
+# Global Style
+style: {
+  font-size: 14
+  font-family: "Inter, system-ui, sans-serif"
+  border-radius: 4
+  shadow: true
+  double-border: false
+}
+

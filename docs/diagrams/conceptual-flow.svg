@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="900" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="600" fill="#f8fafc"/>
+  <text x="450" y="280" font-family="system-ui, sans-serif" font-size="24" text-anchor="middle" fill="#334155">
+    Conceptual Flow Diagram
+  </text>
+  <text x="450" y="320" font-family="system-ui, sans-serif" font-size="16" text-anchor="middle" fill="#64748b">
+    To render this diagram:
+  </text>
+  <text x="450" y="350" font-family="system-ui, sans-serif" font-size="14" text-anchor="middle" fill="#64748b">
+    1. Visit https://excalidraw.com
+  </text>
+  <text x="450" y="375" font-family="system-ui, sans-serif" font-size="14" text-anchor="middle" fill="#64748b">
+    2. Open docs/diagrams/conceptual-flow.excalidraw
+  </text>
+  <text x="450" y="400" font-family="system-ui, sans-serif" font-size="14" text-anchor="middle" fill="#64748b">
+    3. Export as SVG and save as conceptual-flow.svg
+  </text>
+</svg>
+
