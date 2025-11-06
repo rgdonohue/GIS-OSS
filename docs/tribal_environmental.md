@@ -111,3 +111,8 @@ Implementation outline:
 This focus transforms GIS-OSS from a generic GIS assistant into a sovereignty-supporting platform that helps tribes protect
 lands, waters, and cultures while adapting to climate change. The privacy-first architecture isn’t just a feature—it’s a
 requirement for safeguarding sacred knowledge and delivering measurable environmental outcomes.
+
+Refer to:
+- `docs/data_sovereignty.md` for classification, consent, and repatriation protocols.
+- `docs/community_process.md` for governance bodies, engagement workshops, and reciprocity commitments.
+- `docs/legal_architecture.md` for treaty rights, FPIC enforcement, and liability structures.

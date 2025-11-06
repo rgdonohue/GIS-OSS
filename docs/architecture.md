@@ -101,6 +101,8 @@ graph TD
 | Data & Governance | PostgreSQL schemas, pgvector + Redis, object storage (COGs/PMTiles), STAC catalog, audit ledger, carbon metrics, Kafka/Redpanda | Persist vectors/rasters, manage embeddings/caches, track lineage/licensing, stream updates, measure sustainability |
 | Enablement & Ops | Auth/OIDC, observability stack (OpenTelemetry, Prometheus/Grafana), configuration/feature flags, offline asset prep | Security and policy enforcement, monitoring/alerting, configuration management, air-gapped readiness |
 
+Community governance (Elder Council APIs, cultural protocol engine, consent management) and legal controls (FPIC, treaty enforcement, liability) complement these layers—see `docs/community_process.md`, `docs/data_sovereignty.md`, and `docs/legal_architecture.md`.
+
 ## Component Details
 
 ### Query Processor

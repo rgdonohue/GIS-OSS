@@ -113,6 +113,8 @@
 - [ ] Introduce Airflow docker service with minimal DAG (COG ingest, STAC refresh)
 - [ ] Bootstrap dbt project (`pipeline/dbt/`) with spatial models and tests
 - [ ] Wire CI-style `dbt run`/`dbt test` commands into developer workflow
+- [ ] Prototype ESRI geodatabase import/export bridge (supports BIA enterprise datasets)
+- [ ] Define integration adapters for TAAMS/NIOGEMS metadata (read-only)
 
 ### Event-Driven & Streaming
 - [ ] Add Kafka/Redpanda service for telemetry ingest
@@ -186,6 +188,7 @@
 - [ ] Provide QGIS plugin template consuming the API
 - [ ] Author ArcGIS Pro Python toolbox example
 - [ ] Document integration patterns in `docs/integration.md`
+- [ ] Add story-map/temporal narrative support (audio narratives, seasonal layers)
 
 ## Prioritization Notes
 
@@ -223,6 +226,22 @@
 - OpenAPI + documentation portal live
 - Python SDK + CLI published
 - Playground + integration templates available
+
+**Week 8 (Model Training & Serving)**:
+- Dataset plan, pilot fine-tunes
+- Multi-model routing
+- Accuracy benchmark harness
+
+**Week 9 (Community & Ecosystem)**:
+- SpatialBench-Tribal + prompt library seeded
+- Partnership outreach kit prepared
+- Community channels and roadmap artifacts ready
+
+**Week 10 (Governance & Cultural Protocols)**:
+- Consent engine + classification schema implemented
+- Cultural audit logging, seasonal/gender access controls working
+- FPIC/IRB workflow prototype & legal templates drafted
+- Advisory committee engagement plan operational
 
 **Defer to Phase 2**:
 - OAuth/OIDC integration
