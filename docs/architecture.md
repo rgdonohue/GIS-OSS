@@ -11,53 +11,95 @@ GIS-OSS is a privacy-focused geospatial intelligence system that uses open-weigh
 3. **Progressive Enhancement**: Start with basic NL→SQL, add capabilities incrementally
 4. **Audit Everything**: Log all queries, tool calls, and data sources for compliance
 
-## System Architecture
+## System Architecture (Layered)
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                     User Interface                       │
-│                   (CLI / Web / API)                      │
-└────────────────────┬────────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────────┐
-│                    API Gateway                           │
-│                    (FastAPI)                             │
-│  • Request validation                                    │
-│  • Authentication                                        │
-│  • Rate limiting                                         │
-└────────────────────┬────────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────────┐
-│               Query Processor                            │
-│  • Natural language parsing                              │
-│  • Intent classification                                 │
-│  • Parameter extraction                                  │
-└─────────┬──────────┬──────────────┬────────────────────┘
-          │          │              │
-          ▼          ▼              ▼
-┌──────────────┐ ┌──────────┐ ┌──────────────┐
-│ LLM Service  │ │   RAG    │ │ Tool Registry│
-│ (Qwen/Llama) │ │ (pgvector)│ │   (Python)   │
-└──────┬───────┘ └─────┬────┘ └──────┬───────┘
-       │               │              │
-       └───────────────┼──────────────┘
-                       │
-┌──────────────────────▼──────────────────────────────────┐
-│                Spatial & Temporal Engine                 │
-│  • PostGIS + TimescaleDB for vector + time-series        │
-│  • GDAL/rasterio + TiTiler for COG rasters               │
-│  • Vector tiles via pg_tileserv/martin                   │
-│  • Projection management (EPSG)                          │
-└────────────────────┬────────────────────────────────────┘
-                     │
-┌────────────────────▼────────────────────────────────────┐
-│                  Data Layer                              │
-│  • PostgreSQL + PostGIS + TimescaleDB (geometries/time)  │
-│  • pgvector (embeddings)                                 │
-│  • Object storage (COG, STAC collections, PMTiles)       │
-│  • Streaming bus (Kafka/Redpanda) for real-time feeds    │
-└─────────────────────────────────────────────────────────┘
+graph TD
+    subgraph User Layer
+        A[QGIS Plugin]
+        B[Web UI / MapLibre]
+        C[API Clients]
+        D[Jupyter & CLI]
+    end
+
+    subgraph Gateway Layer
+        E[FastAPI Gateway]
+        F[GraphQL Adapter (optional)]
+        G[WebSocket/Server-Sent Events]
+        E -->|REST| H
+        F -->|GraphQL resolvers| H
+        G -->|Streaming updates| H
+    end
+
+    subgraph Intelligence Layer
+        H[Query Router (Router LLM)]
+        I[SQL Generator (Fine-tuned CodeLlama)]
+        J[Spatial Reasoner & Tool Orchestrator]
+        K[Report Generator (Narrative LLM)]
+        LLM[(vLLM Serving Pool + LoRA adapters)]
+        H --> I --> J --> K
+        H --- LLM
+        I --- LLM
+        K --- LLM
+        J -->|Tool calls| M
+    end
+
+    subgraph Execution Layer
+        M[PostGIS 3.4 + TimescaleDB]
+        N[GDAL/rasterio + TiTiler]
+        O[pg_tileserv / martin]
+        P[Apache Sedona (scale-out)]
+        Q[Workflow Orchestrators (Airflow/dbt/Kestra)]
+        J --> M
+        J --> N
+        J --> O
+        P --> M
+        Q --> M
+        Q --> N
+    end
+
+    subgraph Data & Governance Layer
+        R[PostgreSQL (data schema)]
+        S[pgvector + Redis cache]
+        T[Object Storage (COGs/PMTiles)]
+        U[STAC Catalog + Metadata]
+        V[Audit & Attribution Ledger]
+        W[Carbon Metrics Store]
+        X[Streaming Bus (Kafka/Redpanda)]
+        M --> R
+        N --> T
+        O --> S
+        Q --> U
+        J --> V
+        E --> V
+        Q --> X
+    end
+
+    subgraph Enablement & Ops
+        Y[Authentication & Policy (API Keys / OIDC)]
+        Z[Observability (OpenTelemetry + Prometheus/Grafana)]
+        AA[Configuration & Feature Flags]
+        AB[Offline Prep (proj.db, PMTiles, Hugging Face cache)]
+        E --> Y
+        E --> Z
+        H --> Z
+        M --> Z
+        Q --> Z
+        AB --> R
+        AB --> T
+    end
 ```
+
+### Layer Responsibilities
+
+| Layer | Key Components | Responsibilities |
+|-------|----------------|------------------|
+| User Interfaces | QGIS plugin, Web UI/MapLibre, API clients, Jupyter/CLI | Capture queries, render maps/reports, integrate with analyst workflows |
+| Gateway Layer | FastAPI gateway, optional GraphQL adapter, streaming endpoints | Authentication, rate limiting, request validation, multi-protocol surface |
+| Intelligence Layer | Router LLM, SQL generator, tool orchestrator, report generator, vLLM serving pool | Intent detection, NL→SQL/tool translation, reasoning chains, structured narrative output |
+| Execution Layer | PostGIS + TimescaleDB, TiTiler/GDAL, pg_tileserv/martin, Apache Sedona, Airflow/dbt/Kestra | Execute spatial analytics, manage tiles/rasters, schedule ETL, scale out heavy workloads |
+| Data & Governance | PostgreSQL schemas, pgvector + Redis, object storage (COGs/PMTiles), STAC catalog, audit ledger, carbon metrics, Kafka/Redpanda | Persist vectors/rasters, manage embeddings/caches, track lineage/licensing, stream updates, measure sustainability |
+| Enablement & Ops | Auth/OIDC, observability stack (OpenTelemetry, Prometheus/Grafana), configuration/feature flags, offline asset prep | Security and policy enforcement, monitoring/alerting, configuration management, air-gapped readiness |
 
 ## Component Details
 

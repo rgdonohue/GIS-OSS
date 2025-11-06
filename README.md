@@ -169,6 +169,99 @@ result = assistant.query(
 - **Toolchain**: FastAPI + LLM orchestrator + deterministic tooling, surfaced through CLI/Web/API clients.
 - **Integrations**: QGIS plugin, ArcGIS Pro add-in, FME Server webhooks, and Jupyter magic commands ensure humans stay in the loop.
 
+## Layered Architecture Snapshot
+
+```mermaid
+graph TD
+    subgraph User
+        A[QGIS Plugin]
+        B[Web UI / MapLibre]
+        C[API Clients]
+        D[Jupyter & CLI]
+    end
+
+    subgraph Gateway
+        E[FastAPI Gateway]
+        F[GraphQL Adapter<br/>(optional)]
+        G[Streaming (WebSocket/SSE)]
+    end
+
+    subgraph Intelligence
+        H[Router LLM]
+        I[SQL Generator]
+        J[Spatial Tool Orchestrator]
+        K[Report Writer]
+        L[(vLLM Serving Pool)]
+    end
+
+    subgraph Execution
+        M[PostGIS + TimescaleDB]
+        N[TiTiler / GDAL]
+        O[pg_tileserv / martin]
+        P[Apache Sedona (scale-out)]
+        Q[Airflow · dbt · Kestra]
+    end
+
+    subgraph Data & Governance
+        R[PostgreSQL Schemas]
+        S[pgvector + Redis]
+        T[Object Storage<br/>(COGs · PMTiles)]
+        U[STAC Catalog]
+        V[Audit & Attribution Ledger]
+        W[Carbon Metrics]
+        X[Kafka / Redpanda]
+    end
+
+    subgraph Enablement
+        Y[Auth & Policy<br/>(API Keys / OIDC)]
+        Z[Observability<br/>(OTel · Prometheus)]
+        AA[Config & Feature Flags]
+        AB[Offline Assets<br/>(proj.db · models)]
+    end
+
+    A --> E
+    B --> E
+    C --> E
+    D --> E
+    E --> H
+    F --> H
+    G --> H
+    H --> I --> J --> K
+    H --- L
+    I --- L
+    K --- L
+    J --> M
+    J --> N
+    J --> O
+    P --> M
+    Q --> M
+    Q --> N
+    Q --> U
+    J --> V
+    E --> V
+    Q --> X
+    M --> R
+    O --> S
+    N --> T
+    Y --> E
+    Z --> E
+    Z --> H
+    Z --> M
+    AB --> R
+    AB --> T
+```
+
+### Layer Responsibilities
+
+| Layer | Core Components | Responsibilities |
+|-------|-----------------|------------------|
+| User | QGIS plugin, Web UI, API clients, Jupyter/CLI | Capture natural-language queries, visualize results, enable analyst workflows |
+| Gateway | FastAPI gateway, optional GraphQL adapter, streaming endpoints | Authentication, rate limiting, multi-protocol access, request validation |
+| Intelligence | Router LLM, SQL generator, tool orchestrator, report writer, vLLM serving pool | Intent classification, NL→SQL/tool translation, orchestration, narrative generation |
+| Execution | PostGIS + TimescaleDB, TiTiler/GDAL, pg_tileserv, Apache Sedona, Airflow/dbt/Kestra | Run spatial analytics, manage tiles/rasters, schedule ETL, scale out heavy workloads |
+| Data & Governance | PostgreSQL schemas, pgvector + Redis, object storage, STAC catalog, audit ledger, carbon metrics, Kafka/Redpanda | Persist datasets, manage embeddings/caches, track lineage & licenses, stream updates, monitor sustainability |
+| Enablement & Ops | Auth/OIDC, observability stack, config/feature flags, offline asset prep | Security, monitoring, configuration management, air-gapped readiness |
+
 ## Repository Layout
 - `docs/` — Architecture overview, deployment notes (expanding with governance/security playbooks).
 - `core/` *(planned)* — FastAPI backend, LLM orchestration, spatial engine modules.
