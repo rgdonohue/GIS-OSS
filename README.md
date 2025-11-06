@@ -5,20 +5,20 @@ without sending data off-site. Open-weight language models (Qwen 2.5, Llama 3.1,
 requests and route them through deterministic PostGIS/GDAL tools so every map, metric, and report is auditable. The stack
 ships with Docker-based infrastructure, offline-ready datasets, and governance hooks—license tracking, audit logs, and carbon
 reporting—that match public-sector compliance needs. It’s the foundation for client workshops and modernization projects that
-want AI copilots inside ESRI-heavy environments.
+want AI copilots inside ESRI-based environments.
 
 ![GIS OSS image](gis-oss.png)
 
 ## Executive Overview
 - Builds an on-prem, privacy-preserving spatial assistant driven by open-weight LLMs.
 - Orchestrates deterministic PostGIS/GDAL tooling so every result is auditable.
-- Targets ESRI-heavy teams that need a sandboxed AI copilot without sending data offsite.
+- Targets ESRI-based teams that need a sandboxed AI copilot without sending data offsite.
 - Delivers training-ready playbooks and demos aligned with modernization engagements.
 
 ## Why This Matters Now
 - **Open-weight models** like Qwen 2.5 (Apache 2.0) and Llama 3.1 enable private hosting with strong reasoning capabilities.
 - **Client pressure**: regulated utilities, cities, and transportation agencies are asking for AI augmentation but require data residency and reproducible workflows.
-- **Modernization gap**: most ESRI shops lack a controlled environment to experiment with NL→GIS automation; we can supply both the platform and the enablement content.
+- **Modernization gap**: most ESRI-based organizations lack a controlled environment to experiment with NL→GIS automation; we can supply both the platform and the enablement content.
 
 ## Solution Snapshot
 - **LLM as orchestrator**: natural-language parsing and task planning only; spatial math delegated to trusted engines.
