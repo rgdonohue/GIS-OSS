@@ -1,14 +1,5 @@
 <svg width="920" height="640" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 640">
   <defs>
-    <style>
-      .title { font: bold 28px system-ui, sans-serif; fill: #1e293b; }
-      .subtitle { font: italic 16px system-ui, sans-serif; fill: #64748b; }
-      .box-text { font: 15px system-ui, sans-serif; fill: #1e293b; }
-      .small-text { font: 13px system-ui, sans-serif; fill: #475569; }
-      .arrow-text { font: 13px system-ui, sans-serif; fill: #64748b; }
-      .note { font: 13px system-ui, sans-serif; fill: #64748b; }
-      .box { stroke-width: 2.5; rx: 8; }
-    </style>
     <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
       <polygon points="0 0, 10 3, 0 6" fill="#64748b" />
     </marker>
@@ -18,80 +9,80 @@
   <rect width="920" height="640" fill="#f8fafc"/>
   
   <!-- Title -->
-  <text x="460" y="45" text-anchor="middle" class="title">From Query to Tribal Decision</text>
-  <text x="460" y="70" text-anchor="middle" class="subtitle">Privacy-first workflow enforcing data sovereignty at every step</text>
+  <text x="460" y="45" text-anchor="middle" font-family="system-ui, sans-serif" font-size="28" font-weight="bold" fill="#1e293b">From Query to Tribal Decision</text>
+  <text x="460" y="70" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" font-style="italic" fill="#64748b">Privacy-first workflow enforcing data sovereignty at every step</text>
   
   <!-- Step 1: Tribal Staff -->
-  <rect x="60" y="110" width="180" height="90" fill="#dbeafe" stroke="#1e40af" class="box"/>
-  <text x="150" y="135" text-anchor="middle" class="box-text">Tribal Environmental</text>
-  <text x="150" y="155" text-anchor="middle" class="box-text">Staff</text>
-  <text x="150" y="180" text-anchor="middle" class="small-text">"Show me water quality</text>
-  <text x="150" y="195" text-anchor="middle" class="small-text">trends near sacred sites"</text>
+  <rect x="60" y="110" width="180" height="90" fill="#dbeafe" stroke="#1e40af" stroke-width="2.5" rx="8"/>
+  <text x="150" y="135" text-anchor="middle" font-family="system-ui, sans-serif" font-size="15" fill="#1e293b">Tribal Environmental</text>
+  <text x="150" y="155" text-anchor="middle" font-family="system-ui, sans-serif" font-size="15" fill="#1e293b">Staff</text>
+  <text x="150" y="180" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#475569">"Show me water quality</text>
+  <text x="150" y="195" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#475569">trends near sacred sites"</text>
   
   <!-- Arrow 1 -->
   <line x1="240" y1="155" x2="310" y2="155" stroke="#64748b" stroke-width="2" marker-end="url(#arrowhead)"/>
-  <text x="275" y="145" text-anchor="middle" class="arrow-text">Query</text>
+  <text x="275" y="145" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">Query</text>
   
   <!-- Step 2: Governance Check -->
-  <rect x="320" y="110" width="180" height="90" fill="#d1fae5" stroke="#059669" class="box"/>
-  <text x="410" y="135" text-anchor="middle" class="box-text">Governance Check</text>
-  <text x="410" y="160" text-anchor="middle" class="small-text">✓ Consent verified</text>
-  <text x="410" y="178" text-anchor="middle" class="small-text">✓ Sacred sites protected</text>
-  <text x="410" y="195" text-anchor="middle" class="small-text">✓ Access authorized</text>
+  <rect x="320" y="110" width="180" height="90" fill="#d1fae5" stroke="#059669" stroke-width="2.5" rx="8"/>
+  <text x="410" y="135" text-anchor="middle" font-family="system-ui, sans-serif" font-size="15" fill="#1e293b">Governance Check</text>
+  <text x="410" y="160" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#475569">✓ Consent verified</text>
+  <text x="410" y="178" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#475569">✓ Sacred sites protected</text>
+  <text x="410" y="195" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#475569">✓ Access authorized</text>
   
   <!-- Arrow 2 -->
   <line x1="500" y1="155" x2="570" y2="155" stroke="#64748b" stroke-width="2" marker-end="url(#arrowhead)"/>
-  <text x="535" y="145" text-anchor="middle" class="arrow-text">Approved</text>
+  <text x="535" y="145" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">Approved</text>
   
   <!-- Step 3: Spatial Analysis -->
-  <rect x="580" y="110" width="180" height="90" fill="#fed7aa" stroke="#c2410c" class="box"/>
-  <text x="670" y="135" text-anchor="middle" class="box-text">Spatial Analysis</text>
-  <text x="670" y="160" text-anchor="middle" class="small-text">PostGIS queries</text>
-  <text x="670" y="178" text-anchor="middle" class="small-text">+ LLM orchestration</text>
-  <text x="670" y="195" text-anchor="middle" class="small-text">Buffer, join, statistics</text>
+  <rect x="580" y="110" width="180" height="90" fill="#fed7aa" stroke="#c2410c" stroke-width="2.5" rx="8"/>
+  <text x="670" y="135" text-anchor="middle" font-family="system-ui, sans-serif" font-size="15" fill="#1e293b">Spatial Analysis</text>
+  <text x="670" y="160" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#475569">PostGIS queries</text>
+  <text x="670" y="178" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#475569">+ LLM orchestration</text>
+  <text x="670" y="195" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#475569">Buffer, join, statistics</text>
   
   <!-- Arrow 3 (downward) -->
   <line x1="670" y1="200" x2="670" y2="250" stroke="#64748b" stroke-width="2" marker-end="url(#arrowhead)"/>
-  <text x="700" y="230" class="arrow-text">Results</text>
+  <text x="700" y="230" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">Results</text>
   
   <!-- Step 4: Report Generation -->
-  <rect x="580" y="260" width="180" height="90" fill="#fef3c7" stroke="#92400e" class="box"/>
-  <text x="670" y="285" text-anchor="middle" class="box-text">Report Generation</text>
-  <text x="670" y="310" text-anchor="middle" class="small-text">Maps + narratives</text>
-  <text x="670" y="328" text-anchor="middle" class="small-text">Citations &amp; metadata</text>
-  <text x="670" y="345" text-anchor="middle" class="small-text">Audit trail created</text>
+  <rect x="580" y="260" width="180" height="90" fill="#fef3c7" stroke="#92400e" stroke-width="2.5" rx="8"/>
+  <text x="670" y="285" text-anchor="middle" font-family="system-ui, sans-serif" font-size="15" fill="#1e293b">Report Generation</text>
+  <text x="670" y="310" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#475569">Maps + narratives</text>
+  <text x="670" y="328" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#475569">Citations &amp; metadata</text>
+  <text x="670" y="345" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#475569">Audit trail created</text>
   
   <!-- Arrow 4 (curved back to left) -->
   <path d="M 580 305 Q 400 305 400 380" stroke="#64748b" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
-  <text x="480" y="330" class="arrow-text">Deliver</text>
+  <text x="480" y="330" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">Deliver</text>
   
   <!-- Step 5: Tribal Decision -->
-  <rect x="240" y="390" width="320" height="90" fill="#e0e7ff" stroke="#3730a3" class="box"/>
-  <text x="400" y="415" text-anchor="middle" class="box-text">Delivered to Tribal Staff</text>
-  <text x="400" y="440" text-anchor="middle" class="small-text">Ready for tribal council review</text>
-  <text x="400" y="458" text-anchor="middle" class="small-text">Grant submission · Treaty defense</text>
-  <text x="400" y="475" text-anchor="middle" class="small-text">Environmental monitoring · Planning</text>
+  <rect x="240" y="390" width="320" height="90" fill="#e0e7ff" stroke="#3730a3" stroke-width="2.5" rx="8"/>
+  <text x="400" y="415" text-anchor="middle" font-family="system-ui, sans-serif" font-size="15" fill="#1e293b">Delivered to Tribal Staff</text>
+  <text x="400" y="440" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#475569">Ready for tribal council review</text>
+  <text x="400" y="458" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#475569">Grant submission · Treaty defense</text>
+  <text x="400" y="475" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#475569">Environmental monitoring · Planning</text>
   
   <!-- Privacy/Sovereignty Badge -->
-  <rect x="60" y="260" width="180" height="220" fill="#f1f5f9" stroke="#475569" stroke-width="2" stroke-dasharray="4,4" class="box"/>
-  <text x="150" y="285" text-anchor="middle" class="box-text" style="fill:#1e40af; font-weight:bold;">🔒 Data Sovereignty</text>
+  <rect x="60" y="260" width="180" height="220" fill="#f1f5f9" stroke="#475569" stroke-width="2" stroke-dasharray="4,4" rx="8"/>
+  <text x="150" y="285" text-anchor="middle" font-family="system-ui, sans-serif" font-size="15" font-weight="bold" fill="#1e40af">🔒 Data Sovereignty</text>
   
-  <text x="150" y="315" text-anchor="middle" class="note">All data stays</text>
-  <text x="150" y="333" text-anchor="middle" class="note">on-premises</text>
+  <text x="150" y="315" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">All data stays</text>
+  <text x="150" y="333" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">on-premises</text>
   
-  <text x="150" y="363" text-anchor="middle" class="note">Sacred sites auto-</text>
-  <text x="150" y="381" text-anchor="middle" class="note">redacted in exports</text>
+  <text x="150" y="363" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">Sacred sites auto-</text>
+  <text x="150" y="381" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">redacted in exports</text>
   
-  <text x="150" y="411" text-anchor="middle" class="note">Every access logged</text>
-  <text x="150" y="429" text-anchor="middle" class="note">with consent tracking</text>
+  <text x="150" y="411" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">Every access logged</text>
+  <text x="150" y="429" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">with consent tracking</text>
   
-  <text x="150" y="459" text-anchor="middle" class="note">Elder approval</text>
-  <text x="150" y="477" text-anchor="middle" class="note">workflows enforced</text>
+  <text x="150" y="459" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">Elder approval</text>
+  <text x="150" y="477" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">workflows enforced</text>
   
   <!-- Footer Note -->
-  <rect x="60" y="520" width="800" height="90" fill="#fefce8" stroke="#facc15" class="box"/>
-  <text x="460" y="545" text-anchor="middle" class="small-text" style="font-weight:600; fill:#713f12;">Key Principles</text>
-  <text x="460" y="565" text-anchor="middle" class="note">TEK and cultural data never leave tribal custody · Governance checks happen before every query</text>
-  <text x="460" y="583" text-anchor="middle" class="note">Deterministic PostGIS/GDAL ensures reproducible, auditable results</text>
-  <text x="460" y="601" text-anchor="middle" class="note">Open-weight LLMs run on-premises for complete privacy and sovereignty</text>
+  <rect x="60" y="520" width="800" height="90" fill="#fefce8" stroke="#facc15" stroke-width="2.5" rx="8"/>
+  <text x="460" y="545" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="#713f12">Key Principles</text>
+  <text x="460" y="565" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">TEK and cultural data never leave tribal custody · Governance checks happen before every query</text>
+  <text x="460" y="583" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">Deterministic PostGIS/GDAL ensures reproducible, auditable results</text>
+  <text x="460" y="601" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" fill="#64748b">Open-weight LLMs run on-premises for complete privacy and sovereignty</text>
 </svg>
