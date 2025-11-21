@@ -3,12 +3,15 @@ from __future__ import annotations
 from typing import Any, Dict, Optional
 
 import structlog
+from contextlib import asynccontextmanager
+
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
 from psycopg2.extensions import connection as PGConnection
 from pydantic import BaseModel, Field
 
 from src.db.session import db_connection_dependency, initialize_pool, release_pool
 from src.logging_config import configure_logging
+from src.security.authorization import Permission, enforce_permission
 from src.security.rate_limit import RateLimitExceeded, build_rate_limiter
 from src.spatial import (
     buffer_geometry,
@@ -126,10 +129,22 @@ def enforce_rate_limit(
         ) from exc
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    if settings.environment.lower() != "test":
+        initialize_pool(settings)
+    try:
+        yield
+    finally:
+        if settings.environment.lower() != "test":
+            release_pool()
+
+
 app = FastAPI(
     title=settings.app_name,
     version="0.1.0",
     description="GIS-OSS sandbox API",
+    lifespan=lifespan,
 )
 
 
@@ -148,6 +163,7 @@ def query(
     request: QueryRequest,
     __: None = Depends(enforce_rate_limit),
     _: None = Depends(require_api_key),
+    ___: None = Depends(enforce_permission(Permission.QUERY_PUBLIC)),
     conn: PGConnection = Depends(get_db_connection),
 ) -> QueryResponse:
     logger.info(
@@ -185,18 +201,6 @@ def query(
         ),
         request=request,
     )
-
-
-@app.on_event("startup")
-def on_startup() -> None:
-    if settings.environment.lower() != "test":
-        initialize_pool(settings)
-
-
-@app.on_event("shutdown")
-def on_shutdown() -> None:
-    if settings.environment.lower() != "test":
-        release_pool()
 
 
 def _execute_structured_operation(
