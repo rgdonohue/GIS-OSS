@@ -2,6 +2,46 @@
 
 > **Status**: Week 1 Day 1-2 infrastructure tasks completed. Ready to implement spatial functions (Day 3-4).
 
+## Feedback-Driven Priorities (June 2025 Reviews)
+
+Incorporate the June 11 reviews (Claude & OpenAI) before new pilots.
+
+### Governance & Legal Controls
+- [ ] Add `/docs/legal/` with FPIC SOP, CARE→control map, TK/BC enforcement spec, and NAGPRA escalation flow; make CI block releases when this bundle is missing.
+- [ ] Ship a consent ledger + elder approval workflow that records FPIC events (who/when/how) and provide reusable tribal consultation templates.
+- [ ] Draft inter-tribal/federal data-sharing agreements, DPAs, and “no-train” covenants that forbid TEK/sacred data from model training; define breach classes with notification timelines.
+- [ ] Map every TK/BC label to concrete RLS/ABAC policies, export tiers, masking behavior, and appeals/exception handling so enforcement is executable.
+- [ ] Freeze a model usage policy by adding `/policy/model-allowlist.yaml`, generating a license SBOM for each weight, and blocking unapproved models at startup.
+
+### Data Protection & Spatial Governance
+- [ ] Implement Postgres RLS migrations (`policy_subject`, `policy_rule`, `label_state`, `season_window`) plus deterministic geometry redaction/watermarking and “no-train zone” filters for TEK text.
+- [ ] Add jurisdiction-aware spatial layers for overlapping tribal/state/federal authorities and surface them to the NL→GIS planner.
+- [ ] Build cultural sensitivity filters that detect tribal terminology/sacred placenames and route those queries through consultation workflows before execution/export.
+- [ ] Document and enforce NAGPRA handling (classification, escalation, throttled access) for archaeologically sensitive datasets.
+- [ ] Require STAC/assets to carry TK label + CARE metadata and enforce consent/license checks (folder-level permits) before downloads or exports.
+
+### Spatial Tooling & Performance
+- [ ] Expand the audited spatial tool library to include topology validation, raster analytics, and pgRouting-style network analysis so production use cases are covered.
+- [ ] Add geodatabase versioning/conflict resolution workflows that mirror ArcGIS Enterprise expectations.
+- [ ] Publish GPU sizing, spatial indexing, caching, and batch-processing strategies to mitigate the highlighted performance risks.
+- [ ] Deliver the “walking skeleton” stack (PostGIS + pg_tileserv + TiTiler + STAC) alongside the three demo notebooks (`Treaty Defense`, `Sacred Site Storm`, `First Foods Forecast`) with NL→SQL/tool logs.
+- [ ] Create `contrib/benchmarks/` housing SpatialBench-Tribal scenarios wired into CI so the LLM router and policy checks are regression-tested.
+
+### Interop & Packaging
+- [ ] Document ArcGIS/QGIS interoperability in detail (REST/service compatibility, schema translation, ArcPy migration paths, feature publication steps) for ESRI-heavy environments.
+- [ ] Publish an OGC service recipe plus a signed ArcGIS Pro `.pyt` toolbox and sample Pro project that call GIS-OSS endpoints without bypassing TK/BC policy checks.
+- [ ] Provide guidance for packaging offline/edge tiles (PMTiles/COGs to `.vtpk/.tpkx`) and define the OIDC-based identity boundary for ESRI clients.
+- [ ] Ship instructions for composing the edge/offline stack (TiTiler, pg_tileserv, STAC) and validating low-bandwidth raster pyramids pre-pilot.
+- [ ] Outline ESRI partnership/integration milestones to align with the suggested strategic positioning and partner outreach.
+
+### Product & Partnership Readiness
+- [ ] Define licensing, pricing, and support/maintenance structures so prospects can compare offerings against ArcGIS suites.
+- [ ] Launch PoCs with 2–3 tribal nations (with tribal GIS program partnerships) to validate workflows and secure reference customers.
+- [ ] Benchmark GIS-OSS outputs against ArcGIS Notebook/ArcPy workflows and publish the performance/accuracy deltas.
+- [ ] Create a compliance officer/analyst certification program plus workshop kits to monetize enablement while reinforcing governance practice.
+- [ ] Establish a standing advisory council, public changelog, and quarterly legal audit cadence to address community-trust risks.
+- [ ] Build a regional GIS consultant partner network (value props, enablement kit, referral model) to extend delivery capacity.
+
 ## Week 1: Foundation Infrastructure
 
 ### Day 1-2: Environment Setup
@@ -22,11 +62,11 @@
 - [x] Write pytest tests for each function
 
 ### Day 5: Data Loading
-- [ ] Create scripts/load_sample_data.py
-- [ ] Download small OSM extract (< 100MB)
-- [ ] Load into PostGIS with proper indexes
-- [ ] Create sample STAC catalog entry
-- [ ] Document data sources and licenses
+- [x] Create scripts/load_sample_data.py
+- [x] Download small OSM extract (< 100MB)
+- [x] Load into PostGIS with proper indexes
+- [x] Create sample STAC catalog entry
+- [x] Document data sources and licenses
 
 ## Week 2: API and Basic LLM
 

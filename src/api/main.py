@@ -3,12 +3,13 @@ from __future__ import annotations
 from typing import Any, Dict, Optional
 
 import structlog
-from fastapi import Depends, FastAPI, Header, HTTPException, status
+from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
 from psycopg2.extensions import connection as PGConnection
 from pydantic import BaseModel, Field
 
 from src.db.session import db_connection_dependency, initialize_pool, release_pool
 from src.logging_config import configure_logging
+from src.security.rate_limit import RateLimitExceeded, build_rate_limiter
 from src.spatial import (
     buffer_geometry,
     calculate_area,
@@ -73,6 +74,13 @@ def require_api_key(
     settings: Settings = Depends(get_settings),
 ) -> None:
     expected = settings.api_key.strip()
+    # In non-test environments, enforce that an API key is configured
+    if settings.environment.lower() not in ("test", "testing"):
+        if not expected:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="API key not configured. Set API_KEY environment variable.",
+            )
     if expected and x_api_key != expected:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -87,6 +95,36 @@ def get_db_connection(settings: Settings = Depends(get_settings)):
 settings = get_settings()
 configure_logging(settings.log_level)
 logger = structlog.get_logger(__name__)
+rate_limiter = build_rate_limiter(
+    enabled=settings.rate_limit_enabled,
+    environment=settings.environment,
+    max_requests=settings.rate_limit_requests,
+    window_seconds=settings.rate_limit_window_seconds,
+)
+
+
+def get_rate_limiter():
+    return rate_limiter
+
+
+def enforce_rate_limit(
+    request: Request,
+    x_api_key: str = Header(default="", alias="X-API-Key"),
+    limiter=Depends(get_rate_limiter),
+) -> None:
+    identifier = x_api_key.strip() if x_api_key else ""
+    if not identifier:
+        client_host = request.client.host if request and request.client else "anonymous"
+        identifier = f"ip:{client_host}"
+    try:
+        limiter.check(identifier)
+    except RateLimitExceeded as exc:
+        logger.warning("rate_limit.exceeded", identifier=identifier)
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=str(exc),
+        ) from exc
+
 
 app = FastAPI(
     title=settings.app_name,
@@ -108,6 +146,7 @@ def ready() -> Dict[str, str]:
 @app.post("/query", response_model=QueryResponse, tags=["query"])
 def query(
     request: QueryRequest,
+    __: None = Depends(enforce_rate_limit),
     _: None = Depends(require_api_key),
     conn: PGConnection = Depends(get_db_connection),
 ) -> QueryResponse:

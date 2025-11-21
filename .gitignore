@@ -104,3 +104,6 @@ Desktop.ini
 *.crt
 credentials.json
 secrets.yaml
+
+# LLM models
+llm-help/

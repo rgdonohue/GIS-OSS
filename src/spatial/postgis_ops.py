@@ -65,8 +65,9 @@ def buffer_geometry(
     Return a buffered polygon around the given geometry.
 
     The geometry is provided in GeoJSON (dict or JSON string). Distance is
-    converted to meters before delegating to PostGIS. The result is a GeoJSON
-    polygon (or multipolygon) in the same SRID.
+    converted to meters before delegating to PostGIS. Uses geography type
+    for accurate distance calculations regardless of latitude. The result
+    is a GeoJSON polygon (or multipolygon) in the same SRID.
     """
 
     meters = _distance_to_meters(distance, units)
@@ -74,14 +75,11 @@ def buffer_geometry(
 
     query = """
         SELECT ST_AsGeoJSON(
-            ST_Transform(
+            ST_SetSRID(
                 ST_Buffer(
-                    ST_Transform(
-                        ST_SetSRID(ST_GeomFromGeoJSON(%s), %s),
-                        3857
-                    ),
+                    ST_SetSRID(ST_GeomFromGeoJSON(%s), %s)::geography,
                     %s
-                ),
+                )::geometry,
                 %s
             )
         )
@@ -102,16 +100,14 @@ def calculate_area(
 ) -> float:
     """
     Calculate the area of a geometry using PostGIS and return it in the
-    specified units. Defaults to square meters.
+    specified units. Uses geography type for accurate area calculations
+    regardless of latitude. Defaults to square meters.
     """
 
     geom_json = _ensure_geojson_str(geom)
     query = """
         SELECT ST_Area(
-            ST_Transform(
-                ST_SetSRID(ST_GeomFromGeoJSON(%s), %s),
-                3857
-            )
+            ST_SetSRID(ST_GeomFromGeoJSON(%s), %s)::geography
         )
     """
     with conn.cursor() as cur:
@@ -184,7 +180,8 @@ def nearest_neighbors(
                 )
             ) AS distance_m
         FROM {table}
-        ORDER BY {geom_column} <-> ST_SetSRID(ST_GeomFromGeoJSON(%s), %s)
+        ORDER BY ST_Transform({geom_column}, %s) <-> 
+                 ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON(%s), %s), %s)
         LIMIT %s
         """
     ).format(
@@ -193,7 +190,7 @@ def nearest_neighbors(
         table=sql.Identifier(*(table.split(".")) if "." in table else (table,)),
     )
 
-    params = (geom_json, srid, geom_json, srid, limit)
+    params = (geom_json, srid, srid, geom_json, srid, srid, limit)
     with conn.cursor() as cur:
         cur.execute(query, params)
         rows = cur.fetchall()
