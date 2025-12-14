@@ -13,7 +13,10 @@ class Settings(BaseSettings):
 
     app_name: str = "GIS-OSS API"
     api_key: str = Field(default="")
-    environment: str = Field(default="development")
+    environment: str = Field(
+        default="development",
+        validation_alias=AliasChoices("APP_ENV", "ENVIRONMENT", "environment"),
+    )
     db_host: str = Field(default="localhost", validation_alias=AliasChoices("POSTGRES_HOST", "db_host"))
     db_port: int = Field(default=5432, validation_alias=AliasChoices("POSTGRES_PORT", "db_port"))
     db_name: str = Field(default="gis_oss", validation_alias=AliasChoices("POSTGRES_DB", "db_name"))

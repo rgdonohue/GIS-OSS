@@ -11,11 +11,16 @@ from src.api.config import Settings
 
 logger = structlog.get_logger(__name__)
 
-_connection_pool: Optional[pool.SimpleConnectionPool] = None
+_connection_pool: Optional[pool.ThreadedConnectionPool] = None
 
 
 def initialize_pool(settings: Settings) -> None:
-    """Create the global connection pool if it does not already exist."""
+    """Create the global connection pool if it does not already exist.
+
+    Uses ThreadedConnectionPool for thread-safe access, which is required
+    when FastAPI runs sync endpoints in a threadpool (the default behavior
+    with Uvicorn/Gunicorn).
+    """
 
     global _connection_pool
     if _connection_pool is not None:
@@ -33,7 +38,7 @@ def initialize_pool(settings: Settings) -> None:
         min=settings.db_pool_min,
         max=settings.db_pool_max,
     )
-    _connection_pool = pool.SimpleConnectionPool(
+    _connection_pool = pool.ThreadedConnectionPool(
         minconn=settings.db_pool_min,
         maxconn=settings.db_pool_max,
         dsn=dsn,
