@@ -1,41 +1,54 @@
-# NL→GIS via Ollama — Implementation Plan
+# NL→GIS via Ollama — Updated Implementation Plan
 
-Status: ready to build. This captures the weekend plan to wire natural-language queries to the existing GIS operations using Ollama + Qwen2.5.
+Status: Ready to build with security/governance/reliability improvements incorporated from critique.
 
-## Goals
-- Stand up an Ollama-backed LLM client that converts NL → structured operations (`buffer`, `calculate_area`, `find_intersections`, `nearest_neighbors`, `transform_crs`).
-- Add a `/query/natural` endpoint that reuses the existing `_execute_structured_operation` path (rate limit + API key + permission checks stay intact).
-- Add tribal-focused prompting scaffolds and validation/guardrails so responses are strict JSON.
-- Ship unit tests (mocked) and a short usage doc with curl examples.
+## Targets (MVP, still weekend-sized)
+- NL → structured ops (`buffer`, `calculate_area`, `find_intersections`, `nearest_neighbors`, `transform_crs`) using Ollama by default.
+- `/query/natural` reuses `_execute_structured_operation` with existing rate limit, API key, and permission dependencies.
+- Provider abstraction so we can swap Ollama/vLLM/llama.cpp without touching the endpoint.
+- Strict JSON validation + guardrails for inputs/outputs; bounded retries and graceful errors.
 
-## Target Model (default)
-- `qwen2.5:7b-instruct` via Ollama (≈4.7 GB, Apache 2.0, good JSON/SQL fidelity, runs on CPU).
-- Fallbacks (parametrize model name): `llama3.2:3b` (smaller), `mistral:7b` (similar size).
+## Model
+- Default: `qwen2.5:7b-instruct` (≈4.7 GB, Apache 2.0, good JSON/SQL). Parametrize model name.
+- Fallbacks: `llama3.2:3b` (smaller), `mistral:7b` (similar size). Document quantization (4/8-bit) in the integration doc.
 
 ## Files to Create/Update
-- `src/llm/ollama_client.py` — HTTPX client, JSON-only generation, structured logging.
-- `src/llm/prompts.py` — system prompt + tribal few-shots for treaty/jurisdiction/sacred-site contexts.
-- `src/llm/parsers.py` — strict JSON schema/validation and normalization of LLM output to operation + params.
-- `src/api/main.py` — add `/query/natural` endpoint that:
-  - Calls the LLM parser,
-  - Builds `QueryRequest`,
-  - Reuses `_execute_structured_operation`,
-  - Keeps rate limit + API key + permission dependencies.
-- `tests/unit/llm/` — mocked HTTPX tests for client + parser behavior.
-- `docs/llm_integration.md` — setup steps, curl examples, hardware notes.
+- `src/llm/provider.py` — `LLMProvider` interface (`generate_structured(prompt) -> dict`), provider factory.
+- `src/llm/ollama_client.py` — implements provider; HTTPX client with timeout + bounded retries/backoff; JSON-only requests; optional TLS verify flag.
+- `src/llm/prompts.py` — system prompt + tribal few-shots (treaty/jurisdiction/sacred-site/consent).
+- `src/llm/parsers.py` — strict schema/validation (allowlisted operations/units, required params, SRID defaults, unit normalization); rejects unknown fields.
+- `src/api/main.py` — `/query/natural` endpoint that calls provider → parser → `_execute_structured_operation`; add LLM-call rate limit (cheaper RPS) on this route.
+- `tests/unit/llm/` — mocked HTTPX tests for retries, malformed JSON, unknown op/unit, and happy path; endpoint test with stubbed provider.
+- `docs/llm_integration.md` — setup, curl examples, model/quantization notes, perf expectations, TLS guidance.
 
-## Guardrails
-- Force `format: "json"` on the Ollama request.
-- Parse/validate output with operation enum and required params per op; 400 on malformed outputs.
-- Log `llm.parse_query` with input/parsed (no PII).
+## Guardrails & Security (MVP scope)
+- Inputs: cap prompt length, reject non-UTF-8/control tokens; trim whitespace.
+- Outputs: force `format: "json"`; validate against allowlisted ops/units; 400 on malformed/ambiguous/unknown op.
+- Prompt injection: constrained system prompt + strict post-validation; drop extra keys.
+- Sensitive data: no raw geometry in error logs; add `sensitivity` tag stub for future governance gating (sacred/sensitive/public).
+- LLM rate limit: separate limiter on `/query/natural` to protect the LLM backend.
+- Transport: if remote Ollama, enable TLS verify and document it; default to localhost (no data leaves box).
 
-## Steps (suggested order)
-1) Create `src/llm/ollama_client.py` with configurable `base_url`/`model`, timeout, JSON-only responses.  
-2) Add `src/llm/prompts.py` (system prompt + tribal few-shots for treaty boundaries, sacred sites, jurisdiction).  
-3) Add `src/llm/parsers.py` with a schema/validator to map LLM JSON → `{operation, parameters, intent}`; raise on invalid.  
-4) Wire `/query/natural` in `src/api/main.py` to call client → parser → `_execute_structured_operation`; keep existing rate limit/authz.  
-5) Tests: add mocked HTTPX tests for client/parsing; add endpoint test that stubs the client and asserts operation execution.  
-6) Docs: `docs/llm_integration.md` with install + curl examples and model switches.  
+## Reliability
+- Retries: bounded attempts with exponential backoff on 5xx/timeouts; fail fast with clear error.
+- Circuit-breaker (next iteration): short-circuit to 503 after repeated failures.
+- Caching (optional next): LRU on parsed intents per API key for identical prompts.
+- Observability: counters for calls/failures/parse errors/unknown ops; latency histogram; redacted logs.
+
+## Governance Hooks (scaffold now)
+- Few-shots that mention consent/sacred/seasonal.
+- `sensitivity` field in parsed output (stub classifier).
+- Permission hook already on `/query`; later can enforce stricter perms when `sensitivity != public`.
+- Audit logging (future): log operation/table hints, sensitivity, and api_key/user (no raw geom).
+
+## Steps (order of work)
+1) Interface: `LLMProvider` + factory in `src/llm/provider.py`.
+2) Client: `ollama_client.py` with retries/timeouts, TLS option, JSON-only requests.
+3) Prompts: add base system prompt + tribal few-shots in `prompts.py`.
+4) Parser: strict schema in `parsers.py` (ops/units/SRID defaults, unit normalization, drop extras).
+5) Endpoint: `/query/natural` uses provider → parser → `_execute_structured_operation`; add LLM-specific rate limit dependency.
+6) Tests: mock HTTPX; assert retries; assert 400 on bad JSON/unknown op/unknown unit; endpoint stub test.
+7) Docs: `docs/llm_integration.md` with install, curl, model swap, quantization, TLS notes.
 
 ## Ollama Quick Start (local sanity check)
 ```bash
@@ -54,13 +67,13 @@ curl -X POST "http://localhost:8000/query/natural" \
   -d '{"prompt": "Calculate the area of polygon [[0,0],[0,1],[1,1],[1,0],[0,0]] in acres"}'
 ```
 
-## Testing Plan
-- Unit: mock HTTPX responses to assert JSON parsing/validation and log fields.  
-- Endpoint: stub the LLM client to return a known operation; assert `/query/natural` runs `_execute_structured_operation`.  
-- Optional later: integration test marked slow that calls a running Ollama instance.
+## Testing Plan (MVP)
+- Unit: HTTPX mocked; retries/backoff; bad JSON; unknown op/unit; happy path.
+- Endpoint: stub provider; assert `_execute_structured_operation` is invoked; 400s on validation failures.
+- (Next) Slow integration test against live Ollama; prompt regression suite later.
 
-## Next-Weekend Options
-- Swap Ollama for vLLM or llama.cpp if you need throughput/offline edge.  
-- Add SQL generation path for richer queries.  
-- Expand few-shots for tribal governance workflows (consent, seasonal access, sacred-site redaction).  
-- Optional Redis-backed rate limiting if you scale to multiple API instances.
+## Next Iterations (post-MVP)
+- Real sensitivity classifier + permission enforcement before execution.
+- Circuit breaker + caching + Redis-backed rate limiting for multi-instance.
+- Streaming responses; batching (if needed).
+- Perf/gov benchmarks; prompt regression suite; A/B testing for prompt changes.
