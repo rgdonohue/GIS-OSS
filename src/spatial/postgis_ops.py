@@ -161,27 +161,29 @@ def nearest_neighbors(
     Find the nearest features in a table to the provided geometry.
 
     Results include the identifier, distance (meters), and GeoJSON geometry.
+    Uses geography type for both ordering and distance calculation to ensure
+    accurate spherical distances and consistent results.
     """
 
     if limit <= 0:
         raise ValueError("limit must be greater than zero.")
 
     geom_json = _ensure_geojson_str(geom)
+    # Use geography type for accurate spherical distance in meters.
+    # Both the ORDER BY (<->) and ST_Distance use the same geography-based
+    # calculation to ensure ordering matches reported distances.
     query = sql.SQL(
         """
         SELECT
             {id_column},
             ST_AsGeoJSON({geom_column}) AS geom_json,
             ST_Distance(
-                ST_Transform({geom_column}, 3857),
-                ST_Transform(
-                    ST_SetSRID(ST_GeomFromGeoJSON(%s), %s),
-                    3857
-                )
+                ST_Transform({geom_column}, 4326)::geography,
+                ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON(%s), %s), 4326)::geography
             ) AS distance_m
         FROM {table}
-        ORDER BY ST_Transform({geom_column}, %s) <-> 
-                 ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON(%s), %s), %s)
+        ORDER BY ST_Transform({geom_column}, 4326)::geography <->
+                 ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON(%s), %s), 4326)::geography
         LIMIT %s
         """
     ).format(
@@ -190,7 +192,7 @@ def nearest_neighbors(
         table=sql.Identifier(*(table.split(".")) if "." in table else (table,)),
     )
 
-    params = (geom_json, srid, srid, geom_json, srid, srid, limit)
+    params = (geom_json, srid, geom_json, srid, limit)
     with conn.cursor() as cur:
         cur.execute(query, params)
         rows = cur.fetchall()

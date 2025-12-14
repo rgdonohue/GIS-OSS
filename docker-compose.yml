@@ -41,7 +41,7 @@ services:
       - gis-network
 
   titiler:
-    image: ghcr.io/developmentseed/titiler:latest
+    image: ghcr.io/developmentseed/titiler:0.18.9
     container_name: gis-oss-titiler
     ports:
       - "${TITILER_PORT:-8081}:8081"
