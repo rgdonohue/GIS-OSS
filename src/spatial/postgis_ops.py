@@ -14,15 +14,15 @@ the code straightforward to test using mocks.
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Union
 
 from psycopg2 import sql
 from psycopg2.extensions import connection
 
-GeoJSON = Dict[str, Any]
+GeoJSON = dict[str, Any]
 GeoJSONInput = Union[GeoJSON, str]
 
-DISTANCE_TO_METERS: Dict[str, float] = {
+DISTANCE_TO_METERS: dict[str, float] = {
     "meter": 1.0,
     "meters": 1.0,
     "metre": 1.0,
@@ -40,7 +40,7 @@ DISTANCE_TO_METERS: Dict[str, float] = {
     "yards": 0.9144,
 }
 
-AREA_FROM_SQ_METERS: Dict[str, float] = {
+AREA_FROM_SQ_METERS: dict[str, float] = {
     "square_meter": 1.0,
     "square_meters": 1.0,
     "sqm": 1.0,
@@ -124,7 +124,7 @@ def find_intersections(
     geom_a: GeoJSONInput,
     geom_b: GeoJSONInput,
     srid: int = 4326,
-) -> Optional[GeoJSON]:
+) -> GeoJSON | None:
     """
     Compute the intersection between two geometries. Returns GeoJSON or None
     if there is no overlap.
@@ -156,7 +156,7 @@ def nearest_neighbors(
     geom_column: str = "geom",
     id_column: str = "id",
     srid: int = 4326,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Find the nearest features in a table to the provided geometry.
 
@@ -197,7 +197,7 @@ def nearest_neighbors(
         cur.execute(query, params)
         rows = cur.fetchall()
 
-    results: List[Dict[str, Any]] = []
+    results: list[dict[str, Any]] = []
     for row in rows:
         feature_id, geom_result, distance_m = row
         results.append(

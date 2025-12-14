@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from contextlib import asynccontextmanager
+from typing import Any
 
 import structlog
-from contextlib import asynccontextmanager
-
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
 from psycopg2.extensions import connection as PGConnection
 from pydantic import BaseModel, Field
@@ -33,14 +32,14 @@ class QueryRequest(BaseModel):
     include_confidence: bool = Field(
         False, description="Whether to include confidence scores when available."
     )
-    operation: Optional[str] = Field(
+    operation: str | None = Field(
         None,
         description="Structured operation (buffer, calculate_area, find_intersections, nearest_neighbors, transform_crs).",
     )
-    geometry: Optional[Dict[str, Any]] = Field(
+    geometry: dict[str, Any] | None = Field(
         None, description="Primary geometry in GeoJSON format."
     )
-    geometry_b: Optional[Dict[str, Any]] = Field(
+    geometry_b: dict[str, Any] | None = Field(
         None, description="Secondary geometry for operations like intersection."
     )
     table: str = Field(
@@ -48,19 +47,19 @@ class QueryRequest(BaseModel):
         description="Target table for query-based operations.",
     )
     limit: int = Field(default=5, description="Number of results to return.")
-    distance: Optional[float] = Field(
+    distance: float | None = Field(
         None, description="Distance for buffer or nearest-neighbor operations."
     )
-    units: Optional[str] = Field(
+    units: str | None = Field(
         None, description="Units for distance/area (default meters)."
     )
     srid: int = Field(
         default=4326, description="SRID of provided GeoJSON geometry."
     )
-    from_epsg: Optional[int] = Field(
+    from_epsg: int | None = Field(
         None, description="Source EPSG for CRS transformations."
     )
-    to_epsg: Optional[int] = Field(
+    to_epsg: int | None = Field(
         None, description="Target EPSG for CRS transformations."
     )
 
@@ -69,7 +68,7 @@ class QueryResponse(BaseModel):
     status: str
     message: str
     request: QueryRequest
-    result: Optional[Any] = None
+    result: Any | None = None
 
 
 def require_api_key(
@@ -149,12 +148,12 @@ app = FastAPI(
 
 
 @app.get("/health", tags=["system"])
-def health() -> Dict[str, str]:
+def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
 @app.get("/ready", tags=["system"])
-def ready() -> Dict[str, str]:
+def ready() -> dict[str, str]:
     return {"status": "ready"}
 
 
@@ -205,7 +204,7 @@ def query(
 
 def _execute_structured_operation(
     request: QueryRequest, conn: PGConnection
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     op = request.operation.lower()
 
     if op == "buffer":

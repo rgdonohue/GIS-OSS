@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import threading
 import time
-from typing import Dict
 
 
 class RateLimitExceeded(Exception):
@@ -42,10 +41,10 @@ class RateLimiter:
         capacity = burst if burst is not None else max_requests
         self.capacity = float(capacity)
         self.refill_rate = float(max_requests) / float(window_seconds)
-        self._buckets: Dict[str, Dict[str, float]] = {}
+        self._buckets: dict[str, dict[str, float]] = {}
         self._lock = threading.Lock()
 
-    def _refill(self, bucket: Dict[str, float], now: float) -> None:
+    def _refill(self, bucket: dict[str, float], now: float) -> None:
         elapsed = now - bucket["updated"]
         if elapsed <= 0:
             return

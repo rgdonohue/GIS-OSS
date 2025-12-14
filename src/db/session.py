@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Generator, Optional
 
 import structlog
 from psycopg2 import pool
@@ -11,7 +11,7 @@ from src.api.config import Settings
 
 logger = structlog.get_logger(__name__)
 
-_connection_pool: Optional[pool.ThreadedConnectionPool] = None
+_connection_pool: pool.ThreadedConnectionPool | None = None
 
 
 def initialize_pool(settings: Settings) -> None:

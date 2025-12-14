@@ -9,12 +9,11 @@ from __future__ import annotations
 
 import logging
 import sys
-from typing import Optional
 
 import structlog
 
 
-def configure_logging(level: Optional[str] = None) -> None:
+def configure_logging(level: str | None = None) -> None:
     """Configure structlog + standard logging."""
 
     log_level = level or "INFO"

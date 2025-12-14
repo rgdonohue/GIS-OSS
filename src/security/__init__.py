@@ -9,8 +9,8 @@ from .authorization import (
 )
 from .rate_limit import (
     NoOpRateLimiter,
-    RateLimitExceeded,
     RateLimiter,
+    RateLimitExceeded,
     build_rate_limiter,
 )
 

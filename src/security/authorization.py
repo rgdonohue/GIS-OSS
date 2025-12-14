@@ -8,7 +8,6 @@ structure for role/permission checks keyed by API key or other claims.
 from __future__ import annotations
 
 from enum import Enum
-from typing import Optional
 
 from fastapi import Header, HTTPException, status
 
@@ -54,7 +53,7 @@ def enforce_permission(required: Permission):
     FastAPI dependency factory that validates the caller has the given permission.
     """
 
-    def _checker(x_api_key: Optional[str] = Header(default="", alias="X-API-Key")) -> None:
+    def _checker(x_api_key: str | None = Header(default="", alias="X-API-Key")) -> None:
         role = resolve_role_from_api_key(x_api_key or "")
         if not check_permission(role, required):
             raise HTTPException(

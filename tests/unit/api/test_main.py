@@ -1,6 +1,5 @@
 import os
-from contextlib import contextmanager
-from typing import Generator
+from collections.abc import Generator
 from unittest.mock import MagicMock
 
 from fastapi.testclient import TestClient
@@ -11,8 +10,8 @@ from src.api.config import Settings, get_settings
 from src.api.main import app, get_db_connection
 
 
-@contextmanager
 def _fake_db_conn() -> Generator[MagicMock, None, None]:
+    """Fake DB connection generator for testing."""
     conn = MagicMock(name="connection")
     yield conn
 
