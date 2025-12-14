@@ -6,8 +6,8 @@ from fastapi.testclient import TestClient
 
 os.environ.setdefault("APP_ENV", "test")
 
-from src.api.config import Settings, get_settings
-from src.api.main import app, get_db_connection
+from src.api.config import Settings, get_settings  # noqa: E402
+from src.api.main import app, get_db_connection  # noqa: E402
 
 
 def _fake_db_conn() -> Generator[MagicMock, None, None]:

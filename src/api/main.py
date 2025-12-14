@@ -73,7 +73,7 @@ class QueryResponse(BaseModel):
 
 def require_api_key(
     x_api_key: str = Header(default="", alias="X-API-Key"),
-    settings: Settings = Depends(get_settings),
+    settings: Settings = Depends(get_settings),  # noqa: B008
 ) -> None:
     expected = settings.api_key.strip()
     # In non-test environments, enforce that an API key is configured
@@ -90,7 +90,7 @@ def require_api_key(
         )
 
 
-def get_db_connection(settings: Settings = Depends(get_settings)):
+def get_db_connection(settings: Settings = Depends(get_settings)):  # noqa: B008
     yield from db_connection_dependency(settings)
 
 
@@ -112,7 +112,7 @@ def get_rate_limiter():
 def enforce_rate_limit(
     request: Request,
     x_api_key: str = Header(default="", alias="X-API-Key"),
-    limiter=Depends(get_rate_limiter),
+    limiter=Depends(get_rate_limiter),  # noqa: B008
 ) -> None:
     identifier = x_api_key.strip() if x_api_key else ""
     if not identifier:
@@ -130,12 +130,12 @@ def enforce_rate_limit(
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    if settings.environment.lower() != "test":
+    if settings.environment.lower() not in ("test", "testing"):
         initialize_pool(settings)
     try:
         yield
     finally:
-        if settings.environment.lower() != "test":
+        if settings.environment.lower() not in ("test", "testing"):
             release_pool()
 
 
@@ -160,10 +160,10 @@ def ready() -> dict[str, str]:
 @app.post("/query", response_model=QueryResponse, tags=["query"])
 def query(
     request: QueryRequest,
-    __: None = Depends(enforce_rate_limit),
-    _: None = Depends(require_api_key),
-    ___: None = Depends(enforce_permission(Permission.QUERY_PUBLIC)),
-    conn: PGConnection = Depends(get_db_connection),
+    __: None = Depends(enforce_rate_limit),  # noqa: B008
+    _: None = Depends(require_api_key),  # noqa: B008
+    ___: None = Depends(enforce_permission(Permission.QUERY_PUBLIC)),  # noqa: B008
+    conn: PGConnection = Depends(get_db_connection),  # noqa: B008
 ) -> QueryResponse:
     logger.info(
         "query.received",
@@ -205,20 +205,21 @@ def query(
 def _execute_structured_operation(
     request: QueryRequest, conn: PGConnection
 ) -> dict[str, Any]:
+    assert request.operation is not None
     op = request.operation.lower()
 
     if op == "buffer":
         if request.geometry is None or request.distance is None:
             raise ValueError("Buffer requires 'geometry' and 'distance'.")
         units = request.units or "meters"
-        geometry = buffer_geometry(
+        buffered_geometry = buffer_geometry(
             conn,
             geom=request.geometry,
             distance=request.distance,
             units=units,
             srid=request.srid,
         )
-        return {"geometry": geometry, "units": units}
+        return {"geometry": buffered_geometry, "units": units}
 
     if op == "calculate_area":
         if request.geometry is None:
@@ -237,13 +238,13 @@ def _execute_structured_operation(
             raise ValueError(
                 "Intersection requires both 'geometry' and 'geometry_b'."
             )
-        geometry = find_intersections(
+        intersection_geometry = find_intersections(
             conn,
             request.geometry,
             request.geometry_b,
             srid=request.srid,
         )
-        return {"geometry": geometry}
+        return {"geometry": intersection_geometry}
 
     if op == "nearest_neighbors":
         if request.geometry is None:

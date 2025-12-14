@@ -14,13 +14,13 @@ the code straightforward to test using mocks.
 from __future__ import annotations
 
 import json
-from typing import Any, Union
+from typing import Any, cast
 
 from psycopg2 import sql
 from psycopg2.extensions import connection
 
 GeoJSON = dict[str, Any]
-GeoJSONInput = Union[GeoJSON, str]
+GeoJSONInput = GeoJSON | str
 
 DISTANCE_TO_METERS: dict[str, float] = {
     "meter": 1.0,
@@ -89,7 +89,7 @@ def buffer_geometry(
         row = cur.fetchone()
     if not row or row[0] is None:
         raise ValueError("Buffer operation returned no geometry.")
-    return json.loads(row[0])
+    return cast(GeoJSON, json.loads(row[0]))
 
 
 def calculate_area(
@@ -145,7 +145,7 @@ def find_intersections(
         row = cur.fetchone()
     if not row or row[0] is None:
         return None
-    return json.loads(row[0])
+    return cast(GeoJSON, json.loads(row[0]))
 
 
 def nearest_neighbors(
@@ -234,7 +234,7 @@ def transform_crs(
         row = cur.fetchone()
     if not row or row[0] is None:
         raise ValueError("CRS transformation returned no geometry.")
-    return json.loads(row[0])
+    return cast(GeoJSON, json.loads(row[0]))
 
 
 # --------------------------------------------------------------------------- #
