@@ -1,12 +1,17 @@
 # NL→GIS via Ollama — Updated Implementation Plan
 
-Status: Ready to build with security/governance/reliability improvements incorporated from critique.
+Status: Partially implemented (opt-in local planner + strict validation scaffolding).
 
 ## Targets (MVP, still weekend-sized)
 - NL → structured ops (`buffer`, `calculate_area`, `find_intersections`, `nearest_neighbors`, `transform_crs`) using Ollama by default.
 - `/query/natural` reuses `_execute_structured_operation` with existing rate limit, API key, and permission dependencies.
 - Provider abstraction so we can swap Ollama/vLLM/llama.cpp without touching the endpoint.
 - Strict JSON validation + guardrails for inputs/outputs; bounded retries and graceful errors.
+
+Implemented now:
+- `src/llm/provider.py`, `src/llm/ollama_client.py`, `src/llm/planner.py`.
+- `/query` can invoke local planner when `ENABLE_LOCAL_LLM_PLANNER=true`.
+- Grounding regression fixtures in `evals/grounding_cases.json` + runner `scripts/run_grounding_eval.py`.
 
 ## Model
 - Default: `qwen2.5:7b-instruct` (≈4.7 GB, Apache 2.0, good JSON/SQL). Parametrize model name.

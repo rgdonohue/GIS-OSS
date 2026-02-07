@@ -144,8 +144,12 @@ def parse_natural_query_prompt(prompt: str) -> dict[str, Any]:
             "Provide exactly one operation object."
         )
 
+    return validate_structured_operation_payload(candidates[0])
+
+
+def validate_structured_operation_payload(payload: dict[str, Any]) -> dict[str, Any]:
     try:
-        candidate = StructuredOperationCandidate.model_validate(candidates[0])
+        candidate = StructuredOperationCandidate.model_validate(payload)
     except ValidationError as exc:
         raise NaturalQueryParseError(_format_validation_error(exc)) from exc
 

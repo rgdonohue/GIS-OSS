@@ -21,6 +21,7 @@ GIS-OSS is a **privacy-first geospatial sandbox** we are outlining for collabora
 - [Backlog & Milestones](TODO.md) — weekly execution plan.
 - [Agent Instructions](AGENTS.md) — repository + path-scoped guidance for coding agents.
 - [DB Authz Onboarding](docs/security_authz_onboarding.md) — provisioning and operating database-backed API key roles.
+- [LLM Integration Plan](docs/llm_integration_plan.md) — local planner/provider approach and constraints.
 
 ## Why This Matters Now
 - **Open-weight models** (Qwen 2.5, Llama 3.1) enable self-hosted reasoning that respects tribal data sovereignty.
@@ -141,6 +142,9 @@ curl -X POST "http://localhost:8000/query" \
 3. Run `./scripts/setup_dev.sh` to launch PostGIS, TiTiler, and auxiliary services.
    If your Postgres volume already existed before this change, run `./scripts/migrate_readonly_role.sh` once.
 4. Execute `pytest` to validate spatial tool wrappers before integrating the LLM service.
+5. Run quality grounding checks:
+   - `python scripts/run_grounding_eval.py`
+   - `python scripts/verify_sample_data_provenance.py`
 
 ### For Offline/Air-gapped Deployment
 1. On a connected machine, run `./scripts/prepare_offline.sh` to download all dependencies.

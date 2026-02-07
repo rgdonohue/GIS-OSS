@@ -2,6 +2,9 @@
 
 This document tracks the demo datasets bundled with GIS-OSS so we can prove where the data came from, what the license terms are, and how to refresh them safely.
 
+- Canonical machine-readable manifest: `config/sample_data_manifest.json`
+- Validation command: `python scripts/verify_sample_data_provenance.py`
+
 ## OpenStreetMap — District of Columbia Extract
 
 - **Purpose**: Lightweight (<10 MB) dataset for local smoke-tests of PostGIS, STAC metadata, and NL→SQL demos without handling gigabyte-scale files.

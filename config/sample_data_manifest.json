@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "datasets": [
+    {
+      "id": "osm-dc-sample",
+      "title": "OpenStreetMap District of Columbia Extract",
+      "source_url": "https://download.geofabrik.de/north-america/us/district-of-columbia-latest.osm.pbf",
+      "license": "ODbL-1.0",
+      "attribution": "© OpenStreetMap contributors; hosted by Geofabrik GmbH",
+      "local_relative_path": "data/osm/district-of-columbia-latest.osm.pbf",
+      "stac_item_relative_path": "data/stac/osm_dc_sample_item.json",
+      "expected_sha256": ""
+    }
+  ]
+}

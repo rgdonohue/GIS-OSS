@@ -92,6 +92,37 @@ class Settings(BaseSettings):
         default="data.features",
         validation_alias=AliasChoices("ALLOWED_QUERY_TABLES", "allowed_query_tables"),
     )
+    enable_local_llm_planner: bool = Field(
+        default=False,
+        validation_alias=AliasChoices(
+            "ENABLE_LOCAL_LLM_PLANNER",
+            "enable_local_llm_planner",
+        ),
+    )
+    llm_provider: str = Field(
+        default="ollama",
+        validation_alias=AliasChoices("LLM_PROVIDER", "llm_provider"),
+    )
+    llm_ollama_base_url: str = Field(
+        default="http://localhost:11434",
+        validation_alias=AliasChoices("LLM_OLLAMA_BASE_URL", "llm_ollama_base_url"),
+    )
+    llm_model: str = Field(
+        default="qwen2.5:7b-instruct",
+        validation_alias=AliasChoices("LLM_MODEL", "llm_model"),
+    )
+    llm_timeout_seconds: float = Field(
+        default=20,
+        validation_alias=AliasChoices("LLM_TIMEOUT_SECONDS", "llm_timeout_seconds"),
+    )
+    llm_max_retries: int = Field(
+        default=1,
+        validation_alias=AliasChoices("LLM_MAX_RETRIES", "llm_max_retries"),
+    )
+    llm_prompt_max_chars: int = Field(
+        default=4000,
+        validation_alias=AliasChoices("LLM_PROMPT_MAX_CHARS", "llm_prompt_max_chars"),
+    )
 
 
 @lru_cache

@@ -61,7 +61,13 @@ def _build_status_markdown() -> str:
         else "unknown"
     )
     has_natural_route = '"/query/natural"' in api_text
-    if has_natural_route and "parse_natural_query_prompt" in api_text:
+    has_local_planner = "plan_operation_from_prompt" in api_text and "ENABLE_LOCAL_LLM_PLANNER" in config_text
+    if has_natural_route and "parse_natural_query_prompt" in api_text and has_local_planner:
+        nl_status = (
+            "strict parser on `/query/natural`; optional local LLM planner "
+            "for `/query` behind `ENABLE_LOCAL_LLM_PLANNER`"
+        )
+    elif has_natural_route and "parse_natural_query_prompt" in api_text:
         nl_status = (
             "strict parser implemented on `/query/natural` "
             "(requires embedded operation JSON); `/query` is still pending when "

@@ -18,7 +18,7 @@ Source of truth for current implementation status. Generated from repository cod
 - `transform_crs`
 
 ## Current Behavior Flags (Observed)
-- NL orchestration: strict parser implemented on `/query/natural` (requires embedded operation JSON); `/query` is still pending when `operation` is absent
+- NL orchestration: strict parser on `/query/natural`; optional local LLM planner for `/query` behind `ENABLE_LOCAL_LLM_PLANNER`
 - Authorization mode: enforced role/permission map
 - Authorization backend: database-first with static fallback (`AUTHZ_BACKEND`)
 - Rate limiting mode: in-memory token bucket
@@ -28,8 +28,8 @@ Source of truth for current implementation status. Generated from repository cod
 - Telemetry: trace correlation enabled in audit metadata (optional OTel)
 
 ## Test Inventory (Static)
-- Test files: `9`
-- Test cases (`def test_*`): `57`
+- Test files: `13`
+- Test cases (`def test_*`): `71`
 
 ## Notes
 - This document is generated. Do not hand-edit.

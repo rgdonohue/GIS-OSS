@@ -18,6 +18,12 @@ from src.db.session import (
     release_pool,
 )
 from src.governance.audit_logger import log_query_event
+from src.llm import (
+    LLMPlannerInputError,
+    LLMPlannerOutputError,
+    LLMPlannerUnavailableError,
+    plan_operation_from_prompt,
+)
 from src.logging_config import configure_logging
 from src.nl import NaturalQueryParseError, parse_natural_query_prompt
 from src.security.authorization import Permission, check_permission, resolve_role
@@ -248,62 +254,74 @@ def query(
     )
 
     if request.operation:
+        return _execute_structured_request(
+            request=request,
+            conn=conn,
+            x_api_key=x_api_key,
+            started_at=start_time,
+            resolved_role=resolved_role,
+            success_message="Structured operation executed successfully.",
+        )
+
+    if settings.enable_local_llm_planner:
         try:
-            result = _execute_structured_operation(request, conn)
-        except ValueError as exc:
+            planned_fields = plan_operation_from_prompt(
+                prompt=request.prompt,
+                settings=settings,
+            )
+        except LLMPlannerInputError as exc:
             _write_audit_log(
                 conn=conn,
                 request=request,
                 x_api_key=x_api_key,
-                status="invalid_parameters",
+                status="planning_error",
                 started_at=start_time,
                 error_message=str(exc),
                 resolved_role=resolved_role,
             )
-            logger.warning(
-                "query.invalid_parameters",
-                operation=request.operation,
-                error=str(exc),
-            )
             raise HTTPException(status_code=400, detail=str(exc)) from exc
-        except PsycopgError as exc:
-            error_message = "Invalid geometry, CRS, or query parameters."
+        except LLMPlannerOutputError as exc:
             _write_audit_log(
                 conn=conn,
                 request=request,
                 x_api_key=x_api_key,
-                status="db_error",
+                status="planning_error",
                 started_at=start_time,
-                error_message=error_message,
+                error_message=str(exc),
                 resolved_role=resolved_role,
-            )
-            logger.warning(
-                "query.db_error",
-                operation=request.operation,
-                error_type=type(exc).__name__,
             )
             raise HTTPException(
                 status_code=400,
-                detail=error_message,
+                detail=f"LLM planner produced invalid operation: {exc}",
+            ) from exc
+        except LLMPlannerUnavailableError as exc:
+            _write_audit_log(
+                conn=conn,
+                request=request,
+                x_api_key=x_api_key,
+                status="planning_unavailable",
+                started_at=start_time,
+                error_message=str(exc),
+                resolved_role=resolved_role,
+            )
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Local LLM planner unavailable.",
             ) from exc
 
-        _write_audit_log(
+        planned_request = QueryRequest.model_validate(
+            {
+                **request.model_dump(),
+                **planned_fields,
+            }
+        )
+        return _execute_structured_request(
+            request=planned_request,
             conn=conn,
-            request=request,
             x_api_key=x_api_key,
-            status="completed",
             started_at=start_time,
             resolved_role=resolved_role,
-        )
-        verification_status, evidence = _build_grounding_evidence(request)
-        logger.info("query.completed", operation=request.operation)
-        return QueryResponse(
-            status="completed",
-            message="Structured operation executed successfully.",
-            request=request,
-            result=result,
-            verification_status=verification_status,
-            evidence=evidence,
+            success_message="Natural-language query planned and executed successfully.",
         )
 
     _write_audit_log(
@@ -318,7 +336,7 @@ def query(
     return QueryResponse(
         status="pending",
         message=(
-            "LLM orchestration not yet implemented. "
+            "Local LLM planning is disabled. "
             "Provide 'operation' for structured tool execution."
         ),
         request=request,
@@ -373,45 +391,78 @@ def query_natural(
         }
     )
 
+    return _execute_structured_request(
+        request=structured_request,
+        conn=conn,
+        x_api_key=x_api_key,
+        started_at=start_time,
+        resolved_role=resolved_role,
+        success_message="Natural-language query parsed and executed successfully.",
+    )
+
+
+def _execute_structured_request(
+    *,
+    request: QueryRequest,
+    conn: PGConnection,
+    x_api_key: str,
+    started_at: float,
+    resolved_role: str,
+    success_message: str,
+) -> QueryResponse:
     try:
-        result = _execute_structured_operation(structured_request, conn)
+        result = _execute_structured_operation(request, conn)
     except ValueError as exc:
         _write_audit_log(
             conn=conn,
-            request=structured_request,
+            request=request,
             x_api_key=x_api_key,
             status="invalid_parameters",
-            started_at=start_time,
+            started_at=started_at,
             error_message=str(exc),
             resolved_role=resolved_role,
+        )
+        logger.warning(
+            "query.invalid_parameters",
+            operation=request.operation,
+            error=str(exc),
         )
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except PsycopgError as exc:
         error_message = "Invalid geometry, CRS, or query parameters."
         _write_audit_log(
             conn=conn,
-            request=structured_request,
+            request=request,
             x_api_key=x_api_key,
             status="db_error",
-            started_at=start_time,
+            started_at=started_at,
             error_message=error_message,
             resolved_role=resolved_role,
         )
-        raise HTTPException(status_code=400, detail=error_message) from exc
+        logger.warning(
+            "query.db_error",
+            operation=request.operation,
+            error_type=type(exc).__name__,
+        )
+        raise HTTPException(
+            status_code=400,
+            detail=error_message,
+        ) from exc
 
     _write_audit_log(
         conn=conn,
-        request=structured_request,
+        request=request,
         x_api_key=x_api_key,
         status="completed",
-        started_at=start_time,
+        started_at=started_at,
         resolved_role=resolved_role,
     )
-    verification_status, evidence = _build_grounding_evidence(structured_request)
+    verification_status, evidence = _build_grounding_evidence(request)
+    logger.info("query.completed", operation=request.operation)
     return QueryResponse(
         status="completed",
-        message="Natural-language query parsed and executed successfully.",
-        request=structured_request,
+        message=success_message,
+        request=request,
         result=result,
         verification_status=verification_status,
         evidence=evidence,
@@ -536,7 +587,12 @@ def _write_audit_log(
 
     try:
         duration_ms = max(int((perf_counter() - started_at) * 1000), 0)
-        query_type = request.operation.lower() if request.operation else "nl_pending"
+        if request.operation:
+            query_type = request.operation.lower()
+        elif status in {"planning_error", "planning_unavailable"}:
+            query_type = "nl_planning"
+        else:
+            query_type = "nl_pending"
         log_query_event(
             conn,
             user_identifier=x_api_key,

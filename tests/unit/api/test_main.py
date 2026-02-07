@@ -10,6 +10,7 @@ os.environ.setdefault("APP_ENV", "test")
 
 from src.api.config import Settings, get_settings  # noqa: E402
 from src.api.main import app, get_db_connection, require_api_key  # noqa: E402
+from src.llm import LLMPlannerOutputError, LLMPlannerUnavailableError  # noqa: E402
 
 
 def _fake_db_conn() -> Generator[MagicMock, None, None]:
@@ -131,6 +132,73 @@ def test_query_pending_writes_audit_event(monkeypatch):
     assert calls[0]["status"] == "pending"
     assert calls[0]["query_type"] == "nl_pending"
     assert calls[0]["user_identifier"] == "demo-key"
+    _clear_overrides()
+
+
+def test_query_uses_local_planner_when_enabled(monkeypatch):
+    _override_dependencies()
+    fake_geometry = {"type": "Polygon", "coordinates": [[[0, 0], [1, 0], [1, 1], [0, 0]]]}
+
+    monkeypatch.setattr("src.api.main.settings.enable_local_llm_planner", True)
+    monkeypatch.setattr(
+        "src.api.main.plan_operation_from_prompt",
+        lambda prompt, settings: {
+            "operation": "buffer",
+            "geometry": {"type": "Point", "coordinates": [0, 0]},
+            "distance": 100,
+            "units": "meters",
+        },
+    )
+    monkeypatch.setattr("src.api.main.buffer_geometry", lambda *args, **kwargs: fake_geometry)
+
+    response = client.post(
+        "/query",
+        headers={"X-API-Key": ""},
+        json={"prompt": "Buffer this location by 100 meters"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "completed"
+    assert data["request"]["operation"] == "buffer"
+    assert data["result"]["geometry"] == fake_geometry
+    _clear_overrides()
+
+
+def test_query_local_planner_invalid_output_returns_400(monkeypatch):
+    _override_dependencies()
+    monkeypatch.setattr("src.api.main.settings.enable_local_llm_planner", True)
+    monkeypatch.setattr(
+        "src.api.main.plan_operation_from_prompt",
+        lambda prompt, settings: (_ for _ in ()).throw(
+            LLMPlannerOutputError("Unsupported operation 'dissolve'.")
+        ),
+    )
+
+    response = client.post(
+        "/query",
+        headers={"X-API-Key": ""},
+        json={"prompt": "Please dissolve parcels"},
+    )
+    assert response.status_code == 400
+    assert "LLM planner produced invalid operation" in response.json()["detail"]
+    _clear_overrides()
+
+
+def test_query_local_planner_unavailable_returns_503(monkeypatch):
+    _override_dependencies()
+    monkeypatch.setattr("src.api.main.settings.enable_local_llm_planner", True)
+    monkeypatch.setattr(
+        "src.api.main.plan_operation_from_prompt",
+        lambda prompt, settings: (_ for _ in ()).throw(LLMPlannerUnavailableError("down")),
+    )
+
+    response = client.post(
+        "/query",
+        headers={"X-API-Key": ""},
+        json={"prompt": "Find nearby parks"},
+    )
+    assert response.status_code == 503
+    assert "Local LLM planner unavailable" in response.json()["detail"]
     _clear_overrides()
 
 
