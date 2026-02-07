@@ -75,10 +75,10 @@ def buffer_geometry(
 
     query = """
         SELECT ST_AsGeoJSON(
-            ST_SetSRID(
+            ST_Transform(
                 ST_Buffer(
-                    ST_SetSRID(ST_GeomFromGeoJSON(%s), %s)::geography,
-                    %s
+                    ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON(%s), %s), 4326)::geography,
+                    %s::double precision
                 )::geometry,
                 %s
             )
@@ -107,7 +107,7 @@ def calculate_area(
     geom_json = _ensure_geojson_str(geom)
     query = """
         SELECT ST_Area(
-            ST_SetSRID(ST_GeomFromGeoJSON(%s), %s)::geography
+            ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON(%s), %s), 4326)::geography
         )
     """
     with conn.cursor() as cur:

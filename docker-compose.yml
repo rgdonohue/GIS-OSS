@@ -11,6 +11,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-gis_oss}
       POSTGRES_USER: ${POSTGRES_USER:-gis_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_READONLY_USER: ${POSTGRES_READONLY_USER:-gis_readonly}
+      POSTGRES_READONLY_PASSWORD: ${POSTGRES_READONLY_PASSWORD:-changeme_readonly_in_production}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:

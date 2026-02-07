@@ -14,6 +14,41 @@ logger = structlog.get_logger(__name__)
 _connection_pool: pool.ThreadedConnectionPool | None = None
 
 
+def _build_conninfo_dsn(
+    *,
+    db_name: str,
+    db_user: str,
+    db_password: str,
+    db_host: str,
+    db_port: int,
+) -> str:
+    return (
+        f"dbname={db_name} user={db_user} "
+        f"password={db_password} host={db_host} "
+        f"port={db_port}"
+    )
+
+
+def resolve_read_dsn(settings: Settings) -> str:
+    read_dsn = settings.db_read_dsn.strip()
+    if read_dsn:
+        return read_dsn
+
+    primary_dsn = settings.db_dsn.strip()
+    if primary_dsn:
+        return primary_dsn
+
+    read_user = settings.db_read_user.strip() or settings.db_user
+    read_password = settings.db_read_password or settings.db_password
+    return _build_conninfo_dsn(
+        db_name=settings.db_name,
+        db_user=read_user,
+        db_password=read_password,
+        db_host=settings.db_host,
+        db_port=settings.db_port,
+    )
+
+
 def initialize_pool(settings: Settings) -> None:
     """Create the global connection pool if it does not already exist.
 
@@ -26,11 +61,7 @@ def initialize_pool(settings: Settings) -> None:
     if _connection_pool is not None:
         return
 
-    dsn = (
-        f"dbname={settings.db_name} user={settings.db_user} "
-        f"password={settings.db_password} host={settings.db_host} "
-        f"port={settings.db_port}"
-    )
+    dsn = resolve_read_dsn(settings)
     logger.info(
         "db.pool.initialize",
         host=settings.db_host,

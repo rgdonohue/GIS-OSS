@@ -25,21 +25,25 @@ fi
 echo "✓ Docker found"
 
 # Check Docker Compose
-if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
+if command -v docker-compose &> /dev/null; then
+    COMPOSE_CMD=(docker-compose)
+elif docker compose version &> /dev/null; then
+    COMPOSE_CMD=(docker compose)
+else
     echo -e "${RED}Error: Docker Compose is not installed${NC}"
     echo "Please install Docker Compose"
     exit 1
 fi
 echo "✓ Docker Compose found"
 
-# Check Python 3.8+
+# Check Python 3.10+
 if ! command -v python3 &> /dev/null; then
     echo -e "${RED}Error: Python 3 is not installed${NC}"
     exit 1
 fi
 
 python_version=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:2])))')
-required_version="3.8"
+required_version="3.10"
 if [ "$(printf '%s\n' "$required_version" "$python_version" | sort -V | head -n1)" != "$required_version" ]; then
     echo -e "${RED}Error: Python $required_version or higher is required (found $python_version)${NC}"
     exit 1
@@ -58,7 +62,7 @@ if [ ! -f .env ]; then
     if [ -f .env.example ]; then
         cp .env.example .env
         echo "✓ Created .env from .env.example"
-        echo -e "${YELLOW}  Please edit .env and set POSTGRES_PASSWORD${NC}"
+        echo -e "${YELLOW}  Please edit .env and set POSTGRES_PASSWORD and POSTGRES_READONLY_PASSWORD${NC}"
     else
         echo -e "${RED}Warning: .env.example not found${NC}"
     fi
@@ -176,14 +180,14 @@ fi
 
 # Start services
 echo -e "\n${YELLOW}Starting Docker services...${NC}"
-docker-compose up -d postgres redis titiler
+"${COMPOSE_CMD[@]}" up -d postgres redis titiler
 
 # Wait for PostgreSQL to be ready
 echo -e "\n${YELLOW}Waiting for PostgreSQL to be ready...${NC}"
 max_attempts=30
 attempt=0
 while [ $attempt -lt $max_attempts ]; do
-    if docker-compose exec -T postgres pg_isready -U gis_user -d gis_oss &>/dev/null; then
+    if "${COMPOSE_CMD[@]}" exec -T postgres pg_isready -U "${POSTGRES_USER:-gis_user}" -d "${POSTGRES_DB:-gis_oss}" &>/dev/null; then
         echo "✓ PostgreSQL is ready"
         break
     fi
@@ -199,7 +203,7 @@ fi
 
 # Test PostGIS
 echo -e "\n${YELLOW}Testing PostGIS installation...${NC}"
-docker-compose exec -T postgres psql -U gis_user -d gis_oss -c "SELECT PostGIS_Version();" &>/dev/null
+"${COMPOSE_CMD[@]}" exec -T postgres psql -U "${POSTGRES_USER:-gis_user}" -d "${POSTGRES_DB:-gis_oss}" -c "SELECT PostGIS_Version();" &>/dev/null
 if [ $? -eq 0 ]; then
     echo "✓ PostGIS is working"
 else
@@ -218,9 +222,9 @@ echo "Next steps:"
 echo "  1. Edit .env file with your configuration"
 echo "  2. Activate Python environment: source venv/bin/activate"
 echo "  3. Run tests: pytest tests/"
-echo "  4. Start development: python src/api/main.py"
+echo "  4. Start development: uvicorn src.api.main:app --reload"
 echo
-echo "To stop services: docker-compose down"
-echo "To view logs: docker-compose logs -f"
+echo "To stop services: ${COMPOSE_CMD[*]} down"
+echo "To view logs: ${COMPOSE_CMD[*]} logs -f"
 echo
 echo -e "${GREEN}Happy coding!${NC}"

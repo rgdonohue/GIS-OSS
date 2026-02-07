@@ -1,14 +1,21 @@
 from __future__ import annotations
 
+import hashlib
 from contextlib import asynccontextmanager
 from typing import Any
 
 import structlog
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
+from psycopg2 import Error as PsycopgError
 from psycopg2.extensions import connection as PGConnection
 from pydantic import BaseModel, Field
 
-from src.db.session import db_connection_dependency, initialize_pool, release_pool
+from src.db.session import (
+    connection_context,
+    db_connection_dependency,
+    initialize_pool,
+    release_pool,
+)
 from src.logging_config import configure_logging
 from src.security.authorization import Permission, enforce_permission
 from src.security.rate_limit import RateLimitExceeded, build_rate_limiter
@@ -46,22 +53,28 @@ class QueryRequest(BaseModel):
         default="data.features",
         description="Target table for query-based operations.",
     )
-    limit: int = Field(default=5, description="Number of results to return.")
+    limit: int = Field(
+        default=5,
+        ge=1,
+        le=100,
+        description="Number of results to return (1-100).",
+    )
     distance: float | None = Field(
-        None, description="Distance for buffer or nearest-neighbor operations."
+        None,
+        ge=0,
+        description="Distance for buffer or nearest-neighbor operations.",
     )
     units: str | None = Field(
         None, description="Units for distance/area (default meters)."
     )
-    srid: int = Field(
-        default=4326, description="SRID of provided GeoJSON geometry."
-    )
+    srid: int = Field(default=4326, ge=1, le=999_999, description="Input geometry SRID.")
     from_epsg: int | None = Field(
-        None, description="Source EPSG for CRS transformations."
+        None,
+        ge=1,
+        le=999_999,
+        description="Source EPSG for CRS transformations.",
     )
-    to_epsg: int | None = Field(
-        None, description="Target EPSG for CRS transformations."
-    )
+    to_epsg: int | None = Field(None, ge=1, le=999_999, description="Target EPSG.")
 
 
 class QueryResponse(BaseModel):
@@ -97,11 +110,16 @@ def get_db_connection(settings: Settings = Depends(get_settings)):  # noqa: B008
 settings = get_settings()
 configure_logging(settings.log_level)
 logger = structlog.get_logger(__name__)
+allowed_query_tables = {
+    table.strip() for table in settings.allowed_query_tables.split(",") if table.strip()
+} or {"data.features"}
 rate_limiter = build_rate_limiter(
     enabled=settings.rate_limit_enabled,
     environment=settings.environment,
     max_requests=settings.rate_limit_requests,
     window_seconds=settings.rate_limit_window_seconds,
+    max_identifiers=settings.rate_limit_max_identifiers,
+    bucket_ttl_seconds=settings.rate_limit_bucket_ttl_seconds,
 )
 
 
@@ -109,15 +127,21 @@ def get_rate_limiter():
     return rate_limiter
 
 
+def _rate_limit_identifier(request: Request, x_api_key: str) -> str:
+    raw_identifier = x_api_key.strip() if x_api_key else ""
+    if not raw_identifier:
+        client_host = request.client.host if request and request.client else "anonymous"
+        raw_identifier = f"ip:{client_host}"
+    trimmed = raw_identifier[:256]
+    return hashlib.sha256(trimmed.encode("utf-8", errors="ignore")).hexdigest()
+
+
 def enforce_rate_limit(
     request: Request,
     x_api_key: str = Header(default="", alias="X-API-Key"),
     limiter=Depends(get_rate_limiter),  # noqa: B008
 ) -> None:
-    identifier = x_api_key.strip() if x_api_key else ""
-    if not identifier:
-        client_host = request.client.host if request and request.client else "anonymous"
-        identifier = f"ip:{client_host}"
+    identifier = _rate_limit_identifier(request, x_api_key)
     try:
         limiter.check(identifier)
     except RateLimitExceeded as exc:
@@ -154,21 +178,34 @@ def health() -> dict[str, str]:
 
 @app.get("/ready", tags=["system"])
 def ready() -> dict[str, str]:
+    if settings.environment.lower() in ("test", "testing"):
+        return {"status": "ready"}
+    try:
+        with connection_context(settings) as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1")
+                cur.fetchone()
+    except Exception as exc:
+        logger.warning("ready.failed", error_type=type(exc).__name__)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Database not ready.",
+        ) from exc
     return {"status": "ready"}
 
 
 @app.post("/query", response_model=QueryResponse, tags=["query"])
 def query(
     request: QueryRequest,
-    __: None = Depends(enforce_rate_limit),  # noqa: B008
     _: None = Depends(require_api_key),  # noqa: B008
+    __: None = Depends(enforce_rate_limit),  # noqa: B008
     ___: None = Depends(enforce_permission(Permission.QUERY_PUBLIC)),  # noqa: B008
     conn: PGConnection = Depends(get_db_connection),  # noqa: B008
 ) -> QueryResponse:
     logger.info(
         "query.received",
         operation=request.operation,
-        prompt=request.prompt,
+        prompt_length=len(request.prompt),
         return_format=request.return_format,
     )
 
@@ -182,6 +219,16 @@ def query(
                 error=str(exc),
             )
             raise HTTPException(status_code=400, detail=str(exc)) from exc
+        except PsycopgError as exc:
+            logger.warning(
+                "query.db_error",
+                operation=request.operation,
+                error_type=type(exc).__name__,
+            )
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid geometry, CRS, or query parameters.",
+            ) from exc
 
         logger.info("query.completed", operation=request.operation)
         return QueryResponse(
@@ -249,15 +296,20 @@ def _execute_structured_operation(
     if op == "nearest_neighbors":
         if request.geometry is None:
             raise ValueError("Nearest neighbors requires 'geometry'.")
-        limit = max(1, request.limit)
+        table = request.table.strip()
+        if table not in allowed_query_tables:
+            allowed = ", ".join(sorted(allowed_query_tables))
+            raise ValueError(
+                f"Table '{table}' is not permitted. Allowed tables: {allowed}."
+            )
         features = nearest_neighbors(
             conn,
             geom=request.geometry,
-            table=request.table,
-            limit=limit,
+            table=table,
+            limit=request.limit,
             srid=request.srid,
         )
-        return {"features": features, "limit": limit}
+        return {"features": features, "limit": request.limit}
 
     if op == "transform_crs":
         if (

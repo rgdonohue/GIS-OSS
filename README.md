@@ -69,15 +69,17 @@ Each workflow combines plain-language prompts with spatial analysis—buffers, j
 - Jupyter “magic” commands (`%%gis_oss`) for rapid spatial prototyping in notebooks.
 - See `docs/developer_experience.md` for the full DevEx roadmap.
 
-```python
-from gis_oss import SpatialAssistant
-
-assistant = SpatialAssistant(base_url="http://localhost:8000", api_key="dev-key")
-result = assistant.query(
-    "Find upstream industrial permits affecting our fisheries",
-    return_format="geojson",
-    include_confidence=True,
-)
+```bash
+curl -X POST "http://localhost:8000/query" \
+  -H "X-API-Key: dev_key_change_in_production" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Buffer this point by 500 meters",
+    "operation": "buffer",
+    "geometry": {"type": "Point", "coordinates": [-122.42, 37.77]},
+    "distance": 500,
+    "units": "meters"
+  }'
 ```
 
 ## Benchmarks & Targets
@@ -132,7 +134,9 @@ result = assistant.query(
 ## Getting Started (Developers)
 1. Install Docker & Docker Compose (v2+).
 2. Clone this repository and copy `.env.example` to `.env` with local credentials.
+   Set both `POSTGRES_PASSWORD` and `POSTGRES_READONLY_PASSWORD` (or set `READONLY_DATABASE_URL`).
 3. Run `./scripts/setup_dev.sh` to launch PostGIS, TiTiler, and auxiliary services.
+   If your Postgres volume already existed before this change, run `./scripts/migrate_readonly_role.sh` once.
 4. Execute `pytest` to validate spatial tool wrappers before integrating the LLM service.
 
 ### For Offline/Air-gapped Deployment
@@ -143,15 +147,17 @@ result = assistant.query(
 > Note: Model weights are large (7B–70B parameters). Start with Qwen 2.5 7B (INT8) for development on a single GPU, scaling to 32B/70B models for production accuracy. LoRA adapters for router/SQL/report tiers live under `models/finetuned/`.
 
 ## Repository Layout
+- `src/` — FastAPI service, security hooks, DB session management, and PostGIS tool wrappers (implemented).
+- `tests/` — Unit tests for API and spatial helpers (implemented).
+- `scripts/` — Setup/offline prep/data loading/diagram rendering scripts (implemented).
+- `config/` — Postgres Docker image and initialization SQL (implemented).
 - `docs/` — Architecture overview, tribal environmental strategy, data sovereignty, community process, legal architecture, deployment notes.
-- `core/` *(planned)* — FastAPI backend, LLM orchestration, spatial engine modules.
+- `core/` *(planned)* — Expanded backend modules beyond the current `src/` scaffold.
 - `pipeline/` *(planned)* — Airflow DAGs, dbt project, Kestra flows.
 - `web/` *(planned)* — MapLibre-based UI for demos and workshops.
-- `data/` *(planned)* — Sample GeoParquet/COG/PMTiles assets with clear licensing/TEK tagging.
-- `prompts/` *(planned)* — Prompt & scenario library for Tribal use cases.
+- `data/` *(planned)* — Additional sample GeoParquet/COG/PMTiles assets with clear licensing/TEK tagging.
+- `prompts/` *(planned)* — Prompt & scenario library for tribal use cases.
 - `benchmarks/` *(planned)* — SpatialBench-Tribal harness and evaluation scripts.
-- `tests/` *(planned)* — Unit + integration harness, plus benchmark scripts.
-- `scripts/` *(planned)* — Setup, offline prep, model download, and data seeding utilities.
 
 ## Next Executive Checkpoint
 - Validate the Week 1 deliverables (running spatial stack + tested tooling).

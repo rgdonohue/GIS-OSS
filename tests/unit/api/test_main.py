@@ -111,3 +111,21 @@ def test_query_invalid_parameters(monkeypatch):
     assert response.status_code == 400
     assert "requires 'geometry' and 'distance'" in response.json()["detail"]
     _clear_overrides()
+
+
+def test_query_rejects_non_allowlisted_table():
+    _override_dependencies()
+    response = client.post(
+        "/query",
+        headers={"X-API-Key": ""},
+        json={
+            "prompt": "Find nearest features",
+            "operation": "nearest_neighbors",
+            "geometry": {"type": "Point", "coordinates": [0, 0]},
+            "table": "audit.query_log",
+            "limit": 1,
+        },
+    )
+    assert response.status_code == 400
+    assert "not permitted" in response.json()["detail"]
+    _clear_overrides()
