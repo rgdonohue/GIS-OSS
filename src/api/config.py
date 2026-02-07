@@ -68,6 +68,10 @@ class Settings(BaseSettings):
     rate_limit_window_seconds: int = Field(default=60)
     rate_limit_max_identifiers: int = Field(default=10_000)
     rate_limit_bucket_ttl_seconds: int = Field(default=3_600)
+    enable_audit_log: bool = Field(
+        default=True,
+        validation_alias=AliasChoices("ENABLE_AUDIT_LOG", "enable_audit_log"),
+    )
     allowed_query_tables: str = Field(
         default="data.features",
         validation_alias=AliasChoices("ALLOWED_QUERY_TABLES", "allowed_query_tables"),

@@ -1,6 +1,6 @@
 # GIS-OSS Development Backlog
 
-> **Status**: Week 1 Day 1-2 infrastructure tasks completed. Ready to implement spatial functions (Day 3-4).
+> **Status**: Canonical implementation status lives in `docs/project_status.md` (generated from code/tests and validated in CI).
 
 ## Feedback-Driven Priorities (June 2025 Reviews)
 

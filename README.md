@@ -17,6 +17,7 @@ GIS-OSS is a **privacy-first geospatial sandbox** we are outlining for collabora
 - [Community Governance & Engagement Process](docs/community_process.md) — advisory bodies, workshops, reciprocity.
 - [Legal & Jurisdictional Architecture](docs/legal_architecture.md) — CARE/FPIC enforcement, treaty rights, liability.
 - [Developer Experience Plan](docs/developer_experience.md) — SDKs, QA, integrations.
+- [Project Status (Generated)](docs/project_status.md) — code-derived implementation snapshot (validated in CI).
 - [Backlog & Milestones](TODO.md) — weekly execution plan.
 
 ## Why This Matters Now

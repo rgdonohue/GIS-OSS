@@ -7,9 +7,25 @@ on:
     branches: [main]
 
 jobs:
+  status:
+    name: Generated Status
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate generated project status doc
+        run: python scripts/generate_project_status.py --check
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    needs: status
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -30,6 +46,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    needs: status
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -52,6 +69,7 @@ jobs:
   typecheck:
     name: Type Check
     runs-on: ubuntu-latest
+    needs: status
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

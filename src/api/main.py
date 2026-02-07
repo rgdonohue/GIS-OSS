@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 from contextlib import asynccontextmanager
+from time import perf_counter
 from typing import Any
 
 import structlog
@@ -16,7 +17,9 @@ from src.db.session import (
     initialize_pool,
     release_pool,
 )
+from src.governance.audit_logger import log_query_event
 from src.logging_config import configure_logging
+from src.nl import NaturalQueryParseError, parse_natural_query_prompt
 from src.security.authorization import Permission, enforce_permission
 from src.security.rate_limit import RateLimitExceeded, build_rate_limiter
 from src.spatial import (
@@ -82,6 +85,17 @@ class QueryResponse(BaseModel):
     message: str
     request: QueryRequest
     result: Any | None = None
+
+
+class NaturalQueryRequest(BaseModel):
+    prompt: str = Field(..., description="Natural-language query with embedded operation JSON.")
+    return_format: str = Field(
+        "geojson",
+        description="Desired response format (e.g., geojson, table, summary).",
+    )
+    include_confidence: bool = Field(
+        False, description="Whether to include confidence scores when available."
+    )
 
 
 def require_api_key(
@@ -200,8 +214,10 @@ def query(
     _: None = Depends(require_api_key),  # noqa: B008
     __: None = Depends(enforce_rate_limit),  # noqa: B008
     ___: None = Depends(enforce_permission(Permission.QUERY_PUBLIC)),  # noqa: B008
+    x_api_key: str = Header(default="", alias="X-API-Key"),
     conn: PGConnection = Depends(get_db_connection),  # noqa: B008
 ) -> QueryResponse:
+    start_time = perf_counter()
     logger.info(
         "query.received",
         operation=request.operation,
@@ -213,6 +229,14 @@ def query(
         try:
             result = _execute_structured_operation(request, conn)
         except ValueError as exc:
+            _write_audit_log(
+                conn=conn,
+                request=request,
+                x_api_key=x_api_key,
+                status="invalid_parameters",
+                started_at=start_time,
+                error_message=str(exc),
+            )
             logger.warning(
                 "query.invalid_parameters",
                 operation=request.operation,
@@ -220,6 +244,15 @@ def query(
             )
             raise HTTPException(status_code=400, detail=str(exc)) from exc
         except PsycopgError as exc:
+            error_message = "Invalid geometry, CRS, or query parameters."
+            _write_audit_log(
+                conn=conn,
+                request=request,
+                x_api_key=x_api_key,
+                status="db_error",
+                started_at=start_time,
+                error_message=error_message,
+            )
             logger.warning(
                 "query.db_error",
                 operation=request.operation,
@@ -227,9 +260,16 @@ def query(
             )
             raise HTTPException(
                 status_code=400,
-                detail="Invalid geometry, CRS, or query parameters.",
+                detail=error_message,
             ) from exc
 
+        _write_audit_log(
+            conn=conn,
+            request=request,
+            x_api_key=x_api_key,
+            status="completed",
+            started_at=start_time,
+        )
         logger.info("query.completed", operation=request.operation)
         return QueryResponse(
             status="completed",
@@ -238,6 +278,13 @@ def query(
             result=result,
         )
 
+    _write_audit_log(
+        conn=conn,
+        request=request,
+        x_api_key=x_api_key,
+        status="pending",
+        started_at=start_time,
+    )
     logger.info("query.pending", reason="operation_not_provided")
     return QueryResponse(
         status="pending",
@@ -247,6 +294,140 @@ def query(
         ),
         request=request,
     )
+
+
+@app.post("/query/natural", response_model=QueryResponse, tags=["query"])
+def query_natural(
+    request: NaturalQueryRequest,
+    _: None = Depends(require_api_key),  # noqa: B008
+    __: None = Depends(enforce_rate_limit),  # noqa: B008
+    ___: None = Depends(enforce_permission(Permission.QUERY_PUBLIC)),  # noqa: B008
+    x_api_key: str = Header(default="", alias="X-API-Key"),
+    conn: PGConnection = Depends(get_db_connection),  # noqa: B008
+) -> QueryResponse:
+    start_time = perf_counter()
+    logger.info("query_natural.received", prompt_length=len(request.prompt))
+
+    try:
+        parsed_fields = parse_natural_query_prompt(request.prompt)
+    except NaturalQueryParseError as exc:
+        parsed_request = QueryRequest.model_validate(
+            {
+                "prompt": request.prompt,
+                "return_format": request.return_format,
+                "include_confidence": request.include_confidence,
+            }
+        )
+        _write_audit_log(
+            conn=conn,
+            request=parsed_request,
+            x_api_key=x_api_key,
+            status="parse_error",
+            started_at=start_time,
+            error_message=str(exc),
+        )
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    structured_request = QueryRequest.model_validate(
+        {
+            "prompt": request.prompt,
+            "return_format": request.return_format,
+            "include_confidence": request.include_confidence,
+            **parsed_fields,
+        }
+    )
+
+    try:
+        result = _execute_structured_operation(structured_request, conn)
+    except ValueError as exc:
+        _write_audit_log(
+            conn=conn,
+            request=structured_request,
+            x_api_key=x_api_key,
+            status="invalid_parameters",
+            started_at=start_time,
+            error_message=str(exc),
+        )
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except PsycopgError as exc:
+        error_message = "Invalid geometry, CRS, or query parameters."
+        _write_audit_log(
+            conn=conn,
+            request=structured_request,
+            x_api_key=x_api_key,
+            status="db_error",
+            started_at=start_time,
+            error_message=error_message,
+        )
+        raise HTTPException(status_code=400, detail=error_message) from exc
+
+    _write_audit_log(
+        conn=conn,
+        request=structured_request,
+        x_api_key=x_api_key,
+        status="completed",
+        started_at=start_time,
+    )
+    return QueryResponse(
+        status="completed",
+        message="Natural-language query parsed and executed successfully.",
+        request=structured_request,
+        result=result,
+    )
+
+
+def _query_data_sources(request: QueryRequest) -> list[str]:
+    if request.operation and request.operation.lower() == "nearest_neighbors":
+        table = request.table.strip()
+        return [table] if table else []
+    return []
+
+
+def _audit_metadata(request: QueryRequest) -> dict[str, Any]:
+    return {
+        "operation": request.operation,
+        "return_format": request.return_format,
+        "include_confidence": request.include_confidence,
+        "table": request.table,
+        "limit": request.limit,
+        "distance": request.distance,
+        "units": request.units,
+        "srid": request.srid,
+        "from_epsg": request.from_epsg,
+        "to_epsg": request.to_epsg,
+        "geometry": request.geometry,
+        "geometry_b": request.geometry_b,
+    }
+
+
+def _write_audit_log(
+    *,
+    conn: PGConnection,
+    request: QueryRequest,
+    x_api_key: str,
+    status: str,
+    started_at: float,
+    error_message: str | None = None,
+) -> None:
+    if not settings.enable_audit_log:
+        return
+
+    try:
+        duration_ms = max(int((perf_counter() - started_at) * 1000), 0)
+        query_type = request.operation.lower() if request.operation else "nl_pending"
+        log_query_event(
+            conn,
+            user_identifier=x_api_key,
+            prompt=request.prompt,
+            query_type=query_type,
+            execution_time_ms=duration_ms,
+            status=status,
+            error_message=error_message,
+            data_sources=_query_data_sources(request),
+            metadata=_audit_metadata(request),
+        )
+    except Exception as exc:
+        logger.warning("audit.log_failed", error_type=type(exc).__name__)
 
 
 def _execute_structured_operation(
