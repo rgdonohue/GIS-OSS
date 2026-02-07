@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "datasets": [
+    {
+      "id": "ci-fixture-dataset",
+      "title": "CI fixture geospatial dataset",
+      "source_url": "https://example.com/fixtures/provenance_dummy_dataset.json",
+      "license": "CC0-1.0",
+      "attribution": "GIS-OSS CI fixture",
+      "local_relative_path": "tests/fixtures/provenance_dummy_dataset.json",
+      "expected_sha256": "a00c6fd6f40d504960833eaf5e92b5a8969ec69505e9f195d1b6eeb2dc0e8a58"
+    }
+  ]
+}
