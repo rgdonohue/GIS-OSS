@@ -28,6 +28,11 @@ dev = [
     "ruff>=0.1.8",
     "mypy>=1.7.1",
 ]
+telemetry = [
+    "opentelemetry-api>=1.26.0",
+    "opentelemetry-sdk>=1.26.0",
+    "opentelemetry-instrumentation-fastapi>=0.47b0",
+]
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -38,6 +43,9 @@ testpaths = ["tests"]
 pythonpath = ["."]
 filterwarnings = [
     "ignore::DeprecationWarning",
+]
+markers = [
+    "integration: tests requiring external services such as PostGIS",
 ]
 
 [tool.ruff]

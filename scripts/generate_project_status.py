@@ -76,6 +76,11 @@ def _build_status_markdown() -> str:
         if "ALLOWED_QUERY_TABLES" in config_text
         else "not detected"
     )
+    authz_backend_status = (
+        "database-first with static fallback (`AUTHZ_BACKEND`)"
+        if "AUTHZ_BACKEND" in config_text and "resolve_role(" in api_text
+        else "static-only"
+    )
     audit_log_status = (
         "enabled (redacted DB audit writes on `/query`)"
         if "enable_audit_log" in config_text and "log_query_event(" in api_text
@@ -84,6 +89,11 @@ def _build_status_markdown() -> str:
     grounding_contract_status = (
         "enabled (`verification_status` + `evidence` included on query responses)"
         if "verification_status" in api_text and "evidence" in api_text
+        else "not detected"
+    )
+    telemetry_status = (
+        "trace correlation enabled in audit metadata (optional OTel)"
+        if "otel_enabled" in config_text and "current_trace_id()" in api_text
         else "not detected"
     )
 
@@ -105,10 +115,12 @@ Source of truth for current implementation status. Generated from repository cod
 ## Current Behavior Flags (Observed)
 - NL orchestration: {nl_status}
 - Authorization mode: {authz_mode}
+- Authorization backend: {authz_backend_status}
 - Rate limiting mode: {rate_limiter_mode}
 - Query table allowlist: {table_allowlist_status}
 - Audit logging: {audit_log_status}
 - Response grounding contract: {grounding_contract_status}
+- Telemetry: {telemetry_status}
 
 ## Test Inventory (Static)
 - Test files: `{test_files}`

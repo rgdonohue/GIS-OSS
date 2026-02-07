@@ -87,6 +87,20 @@ CREATE TABLE IF NOT EXISTS governance.licenses (
     metadata JSONB
 );
 
+-- API key role mapping (hashed keys only; never store plaintext keys)
+CREATE TABLE IF NOT EXISTS governance.api_keys (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    key_hash TEXT UNIQUE NOT NULL,
+    role TEXT NOT NULL CHECK (role IN ('public', 'member', 'elder', 'admin')),
+    active BOOLEAN DEFAULT true,
+    metadata JSONB,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_api_keys_active ON governance.api_keys(active);
+CREATE INDEX idx_api_keys_role ON governance.api_keys(role);
+
 -- Insert common licenses
 INSERT INTO governance.licenses (dataset_name, license_type, attribution_required, share_alike, commercial_use, license_url, attribution_text)
 VALUES
@@ -146,3 +160,4 @@ COMMENT ON TABLE data.features IS 'Main spatial features table';
 COMMENT ON TABLE data.embeddings IS 'Vector embeddings for RAG';
 COMMENT ON TABLE audit.query_log IS 'Audit trail of all queries';
 COMMENT ON TABLE governance.licenses IS 'License information for datasets';
+COMMENT ON TABLE governance.api_keys IS 'Hashed API keys mapped to roles for authorization';

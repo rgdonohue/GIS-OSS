@@ -1,14 +1,19 @@
 from __future__ import annotations
 
+from unittest.mock import MagicMock
+
 import pytest
 from fastapi import HTTPException
 
 from src.security.authorization import (
     Permission,
     Role,
+    api_key_fingerprint,
     check_permission,
     enforce_permission,
+    resolve_role,
     resolve_role_from_api_key,
+    resolve_role_from_database,
 )
 
 
@@ -25,6 +30,55 @@ def test_resolve_role_from_api_key_honors_prefixes():
 
 def test_resolve_role_from_api_key_unknown_nonempty_defaults_to_member():
     assert resolve_role_from_api_key("opaque_key_value") == Role.MEMBER
+
+
+def test_api_key_fingerprint_is_stable():
+    assert api_key_fingerprint("abc123") == api_key_fingerprint("abc123")
+    assert api_key_fingerprint("abc123") != api_key_fingerprint("xyz789")
+
+
+def test_resolve_role_from_database_returns_matching_role():
+    conn = MagicMock()
+    cursor = MagicMock()
+    cursor.fetchone.return_value = ("elder",)
+    conn.cursor.return_value.__enter__.return_value = cursor
+
+    role = resolve_role_from_database(conn, "some-key")
+
+    assert role == Role.ELDER
+
+
+def test_resolve_role_from_database_returns_none_for_missing_key():
+    conn = MagicMock()
+    cursor = MagicMock()
+    cursor.fetchone.return_value = None
+    conn.cursor.return_value.__enter__.return_value = cursor
+
+    role = resolve_role_from_database(conn, "some-key")
+
+    assert role is None
+
+
+def test_resolve_role_prefers_database_backend_when_available():
+    conn = MagicMock()
+    cursor = MagicMock()
+    cursor.fetchone.return_value = ("admin",)
+    conn.cursor.return_value.__enter__.return_value = cursor
+
+    role = resolve_role(api_key="member:abc", authz_backend="database", conn=conn)
+
+    assert role == Role.ADMIN
+
+
+def test_resolve_role_falls_back_to_static_when_database_has_no_match():
+    conn = MagicMock()
+    cursor = MagicMock()
+    cursor.fetchone.return_value = None
+    conn.cursor.return_value.__enter__.return_value = cursor
+
+    role = resolve_role(api_key="elder:abc", authz_backend="database", conn=conn)
+
+    assert role == Role.ELDER
 
 
 def test_check_permission_enforces_matrix():

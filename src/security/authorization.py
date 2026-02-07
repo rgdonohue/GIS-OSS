@@ -7,9 +7,11 @@ an explicit permission matrix. Unknown non-empty API keys default to MEMBER.
 
 from __future__ import annotations
 
+import hashlib
 from enum import Enum
 
 from fastapi import Header, HTTPException, status
+from psycopg2.extensions import connection as PGConnection
 
 
 class Role(str, Enum):
@@ -24,6 +26,11 @@ class Permission(str, Enum):
     QUERY_SENSITIVE = "query:sensitive"
     QUERY_SACRED = "query:sacred"
     EXPORT_DATA = "export:data"
+
+
+def api_key_fingerprint(api_key: str) -> str:
+    normalized = api_key.strip()
+    return hashlib.sha256(normalized.encode("utf-8", errors="ignore")).hexdigest()
 
 
 def resolve_role_from_api_key(api_key: str) -> Role:
@@ -54,6 +61,58 @@ def resolve_role_from_api_key(api_key: str) -> Role:
         return Role.PUBLIC
 
     return Role.MEMBER
+
+
+def _normalize_role(raw_role: str | None) -> Role | None:
+    if raw_role is None:
+        return None
+    normalized = raw_role.strip().lower()
+    for role in Role:
+        if role.value == normalized:
+            return role
+    return None
+
+
+def resolve_role_from_database(conn: PGConnection, api_key: str) -> Role | None:
+    """
+    Resolve role from governance.api_keys using a SHA-256 API key fingerprint.
+    """
+
+    normalized = api_key.strip()
+    if not normalized:
+        return Role.PUBLIC
+
+    key_hash = api_key_fingerprint(normalized)
+    query = """
+        SELECT role
+        FROM governance.api_keys
+        WHERE key_hash = %s
+          AND active = TRUE
+        LIMIT 1
+    """
+    with conn.cursor() as cur:
+        cur.execute(query, (key_hash,))
+        row = cur.fetchone()
+    if not row:
+        return None
+    return _normalize_role(row[0])
+
+
+def resolve_role(
+    *,
+    api_key: str,
+    authz_backend: str,
+    conn: PGConnection | None = None,
+) -> Role:
+    backend = authz_backend.strip().lower()
+    if backend == "database" and conn is not None:
+        try:
+            role = resolve_role_from_database(conn, api_key)
+        except Exception:
+            role = None
+        if role is not None:
+            return role
+    return resolve_role_from_api_key(api_key)
 
 
 def check_permission(

@@ -20,14 +20,16 @@ Source of truth for current implementation status. Generated from repository cod
 ## Current Behavior Flags (Observed)
 - NL orchestration: strict parser implemented on `/query/natural` (requires embedded operation JSON); `/query` is still pending when `operation` is absent
 - Authorization mode: enforced role/permission map
+- Authorization backend: database-first with static fallback (`AUTHZ_BACKEND`)
 - Rate limiting mode: in-memory token bucket
 - Query table allowlist: enabled (`ALLOWED_QUERY_TABLES` in settings)
 - Audit logging: enabled (redacted DB audit writes on `/query`)
 - Response grounding contract: enabled (`verification_status` + `evidence` included on query responses)
+- Telemetry: trace correlation enabled in audit metadata (optional OTel)
 
 ## Test Inventory (Static)
-- Test files: `8`
-- Test cases (`def test_*`): `46`
+- Test files: `9`
+- Test cases (`def test_*`): `57`
 
 ## Notes
 - This document is generated. Do not hand-edit.

@@ -20,7 +20,7 @@ from src.db.session import (
 from src.governance.audit_logger import log_query_event
 from src.logging_config import configure_logging
 from src.nl import NaturalQueryParseError, parse_natural_query_prompt
-from src.security.authorization import Permission, enforce_permission
+from src.security.authorization import Permission, check_permission, resolve_role
 from src.security.rate_limit import RateLimitExceeded, build_rate_limiter
 from src.spatial import (
     buffer_geometry,
@@ -29,6 +29,7 @@ from src.spatial import (
     nearest_neighbors,
     transform_crs,
 )
+from src.telemetry import configure_tracing, current_trace_id, instrument_fastapi_app
 
 from .config import Settings, get_settings
 
@@ -104,19 +105,32 @@ def require_api_key(
     x_api_key: str = Header(default="", alias="X-API-Key"),
     settings: Settings = Depends(get_settings),  # noqa: B008
 ) -> None:
+    is_test_env = settings.environment.lower() in ("test", "testing")
+    use_database_authz = settings.authz_backend.lower() == "database"
     expected = settings.api_key.strip()
-    # In non-test environments, enforce that an API key is configured
-    if settings.environment.lower() not in ("test", "testing"):
-        if not expected:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="API key not configured. Set API_KEY environment variable.",
-            )
-    if expected and x_api_key != expected:
+
+    # In non-test environments using static key auth, enforce API_KEY presence.
+    if not is_test_env and not use_database_authz and not expected:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="API key not configured. Set API_KEY environment variable.",
+        )
+
+    # Legacy exact-match mode when static auth is enabled.
+    if expected and not use_database_authz and x_api_key != expected:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid API key.",
         )
+
+    # Database-backed authz mode supports per-key role resolution.
+    # If public access is disabled, require a key outside test environments.
+    if use_database_authz and not is_test_env:
+        if not x_api_key.strip() and not settings.allow_public_api:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid API key.",
+            )
 
 
 def get_db_connection(settings: Settings = Depends(get_settings)):  # noqa: B008
@@ -125,6 +139,7 @@ def get_db_connection(settings: Settings = Depends(get_settings)):  # noqa: B008
 
 settings = get_settings()
 configure_logging(settings.log_level)
+configure_tracing(settings)
 logger = structlog.get_logger(__name__)
 allowed_query_tables = {
     table.strip() for table in settings.allowed_query_tables.split(",") if table.strip()
@@ -185,6 +200,7 @@ app = FastAPI(
     description="GIS-OSS sandbox API",
     lifespan=lifespan,
 )
+instrument_fastapi_app(app, settings)
 
 
 @app.get("/health", tags=["system"])
@@ -215,11 +231,15 @@ def query(
     request: QueryRequest,
     _: None = Depends(require_api_key),  # noqa: B008
     __: None = Depends(enforce_rate_limit),  # noqa: B008
-    ___: None = Depends(enforce_permission(Permission.QUERY_PUBLIC)),  # noqa: B008
     x_api_key: str = Header(default="", alias="X-API-Key"),
     conn: PGConnection = Depends(get_db_connection),  # noqa: B008
 ) -> QueryResponse:
     start_time = perf_counter()
+    resolved_role = _assert_permission(
+        required_permission=Permission.QUERY_PUBLIC,
+        x_api_key=x_api_key,
+        conn=conn,
+    )
     logger.info(
         "query.received",
         operation=request.operation,
@@ -238,6 +258,7 @@ def query(
                 status="invalid_parameters",
                 started_at=start_time,
                 error_message=str(exc),
+                resolved_role=resolved_role,
             )
             logger.warning(
                 "query.invalid_parameters",
@@ -254,6 +275,7 @@ def query(
                 status="db_error",
                 started_at=start_time,
                 error_message=error_message,
+                resolved_role=resolved_role,
             )
             logger.warning(
                 "query.db_error",
@@ -271,6 +293,7 @@ def query(
             x_api_key=x_api_key,
             status="completed",
             started_at=start_time,
+            resolved_role=resolved_role,
         )
         verification_status, evidence = _build_grounding_evidence(request)
         logger.info("query.completed", operation=request.operation)
@@ -289,6 +312,7 @@ def query(
         x_api_key=x_api_key,
         status="pending",
         started_at=start_time,
+        resolved_role=resolved_role,
     )
     logger.info("query.pending", reason="operation_not_provided")
     return QueryResponse(
@@ -308,11 +332,15 @@ def query_natural(
     request: NaturalQueryRequest,
     _: None = Depends(require_api_key),  # noqa: B008
     __: None = Depends(enforce_rate_limit),  # noqa: B008
-    ___: None = Depends(enforce_permission(Permission.QUERY_PUBLIC)),  # noqa: B008
     x_api_key: str = Header(default="", alias="X-API-Key"),
     conn: PGConnection = Depends(get_db_connection),  # noqa: B008
 ) -> QueryResponse:
     start_time = perf_counter()
+    resolved_role = _assert_permission(
+        required_permission=Permission.QUERY_PUBLIC,
+        x_api_key=x_api_key,
+        conn=conn,
+    )
     logger.info("query_natural.received", prompt_length=len(request.prompt))
 
     try:
@@ -332,6 +360,7 @@ def query_natural(
             status="parse_error",
             started_at=start_time,
             error_message=str(exc),
+            resolved_role=resolved_role,
         )
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
@@ -354,6 +383,7 @@ def query_natural(
             status="invalid_parameters",
             started_at=start_time,
             error_message=str(exc),
+            resolved_role=resolved_role,
         )
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except PsycopgError as exc:
@@ -365,6 +395,7 @@ def query_natural(
             status="db_error",
             started_at=start_time,
             error_message=error_message,
+            resolved_role=resolved_role,
         )
         raise HTTPException(status_code=400, detail=error_message) from exc
 
@@ -374,6 +405,7 @@ def query_natural(
         x_api_key=x_api_key,
         status="completed",
         started_at=start_time,
+        resolved_role=resolved_role,
     )
     verification_status, evidence = _build_grounding_evidence(structured_request)
     return QueryResponse(
@@ -407,7 +439,27 @@ def _audit_metadata(request: QueryRequest) -> dict[str, Any]:
         "to_epsg": request.to_epsg,
         "geometry": request.geometry,
         "geometry_b": request.geometry_b,
+        "trace_id": current_trace_id(),
     }
+
+
+def _assert_permission(
+    *,
+    required_permission: Permission,
+    x_api_key: str,
+    conn: PGConnection,
+) -> str:
+    role = resolve_role(
+        api_key=x_api_key,
+        authz_backend=settings.authz_backend,
+        conn=conn,
+    )
+    if not check_permission(role, required_permission):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions for this operation.",
+        )
+    return role.value
 
 
 def _build_grounding_evidence(request: QueryRequest) -> tuple[str, list[dict[str, Any]]]:
@@ -477,6 +529,7 @@ def _write_audit_log(
     status: str,
     started_at: float,
     error_message: str | None = None,
+    resolved_role: str | None = None,
 ) -> None:
     if not settings.enable_audit_log:
         return
@@ -493,7 +546,7 @@ def _write_audit_log(
             status=status,
             error_message=error_message,
             data_sources=_query_data_sources(request),
-            metadata=_audit_metadata(request),
+            metadata={**_audit_metadata(request), "resolved_role": resolved_role},
         )
     except Exception as exc:
         logger.warning("audit.log_failed", error_type=type(exc).__name__)

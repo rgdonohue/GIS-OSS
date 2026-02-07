@@ -19,6 +19,7 @@ GIS-OSS is a **privacy-first geospatial sandbox** we are outlining for collabora
 - [Developer Experience Plan](docs/developer_experience.md) — SDKs, QA, integrations.
 - [Project Status (Generated)](docs/project_status.md) — code-derived implementation snapshot (validated in CI).
 - [Backlog & Milestones](TODO.md) — weekly execution plan.
+- [Agent Instructions](AGENTS.md) — repository + path-scoped guidance for coding agents.
 
 ## Why This Matters Now
 - **Open-weight models** (Qwen 2.5, Llama 3.1) enable self-hosted reasoning that respects tribal data sovereignty.

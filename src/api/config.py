@@ -68,6 +68,22 @@ class Settings(BaseSettings):
     rate_limit_window_seconds: int = Field(default=60)
     rate_limit_max_identifiers: int = Field(default=10_000)
     rate_limit_bucket_ttl_seconds: int = Field(default=3_600)
+    authz_backend: str = Field(
+        default="database",
+        validation_alias=AliasChoices("AUTHZ_BACKEND", "authz_backend"),
+    )
+    allow_public_api: bool = Field(
+        default=False,
+        validation_alias=AliasChoices("ALLOW_PUBLIC_API", "allow_public_api"),
+    )
+    otel_enabled: bool = Field(
+        default=False,
+        validation_alias=AliasChoices("ENABLE_OTEL", "otel_enabled"),
+    )
+    otel_service_name: str = Field(
+        default="gis-oss-api",
+        validation_alias=AliasChoices("OTEL_SERVICE_NAME", "otel_service_name"),
+    )
     enable_audit_log: bool = Field(
         default=True,
         validation_alias=AliasChoices("ENABLE_AUDIT_LOG", "enable_audit_log"),
