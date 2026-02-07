@@ -85,6 +85,8 @@ class QueryResponse(BaseModel):
     message: str
     request: QueryRequest
     result: Any | None = None
+    verification_status: str
+    evidence: list[dict[str, Any]]
 
 
 class NaturalQueryRequest(BaseModel):
@@ -270,12 +272,15 @@ def query(
             status="completed",
             started_at=start_time,
         )
+        verification_status, evidence = _build_grounding_evidence(request)
         logger.info("query.completed", operation=request.operation)
         return QueryResponse(
             status="completed",
             message="Structured operation executed successfully.",
             request=request,
             result=result,
+            verification_status=verification_status,
+            evidence=evidence,
         )
 
     _write_audit_log(
@@ -293,6 +298,8 @@ def query(
             "Provide 'operation' for structured tool execution."
         ),
         request=request,
+        verification_status="unverified",
+        evidence=[],
     )
 
 
@@ -368,11 +375,14 @@ def query_natural(
         status="completed",
         started_at=start_time,
     )
+    verification_status, evidence = _build_grounding_evidence(structured_request)
     return QueryResponse(
         status="completed",
         message="Natural-language query parsed and executed successfully.",
         request=structured_request,
         result=result,
+        verification_status=verification_status,
+        evidence=evidence,
     )
 
 
@@ -398,6 +408,65 @@ def _audit_metadata(request: QueryRequest) -> dict[str, Any]:
         "geometry": request.geometry,
         "geometry_b": request.geometry_b,
     }
+
+
+def _build_grounding_evidence(request: QueryRequest) -> tuple[str, list[dict[str, Any]]]:
+    operation = request.operation.lower() if request.operation else None
+    if operation is None:
+        return "unverified", []
+
+    if operation in {"buffer", "calculate_area", "transform_crs"}:
+        return (
+            "verified",
+            [
+                {
+                    "source_id": "request.geometry",
+                    "source_kind": "input_geometry",
+                    "verification": "verified",
+                    "details": "Computed deterministically from request-provided geometry.",
+                }
+            ],
+        )
+
+    if operation == "find_intersections":
+        return (
+            "verified",
+            [
+                {
+                    "source_id": "request.geometry",
+                    "source_kind": "input_geometry",
+                    "verification": "verified",
+                    "details": "First geometry provided by caller.",
+                },
+                {
+                    "source_id": "request.geometry_b",
+                    "source_kind": "input_geometry",
+                    "verification": "verified",
+                    "details": "Second geometry provided by caller.",
+                },
+            ],
+        )
+
+    if operation == "nearest_neighbors":
+        table = request.table.strip()
+        if not table:
+            return "unverified", []
+        return (
+            "unverified",
+            [
+                {
+                    "source_id": table,
+                    "source_kind": "database_table",
+                    "verification": "unverified",
+                    "details": (
+                        "Table-level source captured; row-level provenance and "
+                        "license binding are not yet attached."
+                    ),
+                }
+            ],
+        )
+
+    return "unverified", []
 
 
 def _write_audit_log(

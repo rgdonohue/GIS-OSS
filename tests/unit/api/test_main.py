@@ -66,6 +66,8 @@ def test_query_pending_when_operation_missing():
     data = response.json()
     assert data["status"] == "pending"
     assert "Provide 'operation'" in data["message"]
+    assert data["verification_status"] == "unverified"
+    assert data["evidence"] == []
     _clear_overrides()
 
 
@@ -149,6 +151,8 @@ def test_query_natural_executes_parsed_operation(monkeypatch):
     assert data["status"] == "completed"
     assert data["result"]["geometry"] == fake_geometry
     assert data["request"]["operation"] == "buffer"
+    assert data["verification_status"] == "verified"
+    assert data["evidence"][0]["source_kind"] == "input_geometry"
     _clear_overrides()
 
 
@@ -176,6 +180,8 @@ def test_query_buffer_operation(monkeypatch):
     data = response.json()
     assert data["status"] == "completed"
     assert data["result"]["geometry"] == fake_geometry
+    assert data["verification_status"] == "verified"
+    assert data["evidence"][0]["source_id"] == "request.geometry"
     _clear_overrides()
 
 
@@ -236,4 +242,32 @@ def test_query_rejects_non_allowlisted_table():
     )
     assert response.status_code == 400
     assert "not permitted" in response.json()["detail"]
+    _clear_overrides()
+
+
+def test_query_nearest_neighbors_marks_response_unverified(monkeypatch):
+    _override_dependencies()
+
+    def fake_nearest(conn, geom, table, limit, srid):
+        return [{"id": "feature-1", "geometry": None, "distance_meters": 1.0}]
+
+    monkeypatch.setattr("src.api.main.nearest_neighbors", fake_nearest)
+
+    response = client.post(
+        "/query",
+        headers={"X-API-Key": ""},
+        json={
+            "prompt": "Find nearest features",
+            "operation": "nearest_neighbors",
+            "geometry": {"type": "Point", "coordinates": [0, 0]},
+            "table": "data.features",
+            "limit": 1,
+        },
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "completed"
+    assert data["verification_status"] == "unverified"
+    assert data["evidence"][0]["source_id"] == "data.features"
+    assert data["evidence"][0]["verification"] == "unverified"
     _clear_overrides()

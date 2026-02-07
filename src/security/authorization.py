@@ -1,8 +1,8 @@
 """
 Minimal RBAC scaffolding to support future governance rules.
 
-Current implementation is permissive (returns True) but preserves
-structure for role/permission checks keyed by API key or other claims.
+This module provides deterministic role resolution from API key prefixes and
+an explicit permission matrix. Unknown non-empty API keys default to MEMBER.
 """
 
 from __future__ import annotations
@@ -28,12 +28,32 @@ class Permission(str, Enum):
 
 def resolve_role_from_api_key(api_key: str) -> Role:
     """
-    Placeholder role resolver. Swap with a lookup (DB/cache) when roles are defined.
+    Resolve role from API key conventions.
+
+    Supported prefixes:
+    - admin:
+    - elder:
+    - member:
+    - public:
+
+    If no key is provided, callers are treated as PUBLIC.
+    Unknown non-empty keys default to MEMBER.
     """
 
-    if not api_key:
+    normalized = api_key.strip().lower()
+    if not normalized:
         return Role.PUBLIC
-    return Role.ADMIN
+
+    if normalized.startswith("admin:") or normalized == "admin":
+        return Role.ADMIN
+    if normalized.startswith("elder:") or normalized == "elder":
+        return Role.ELDER
+    if normalized.startswith("member:") or normalized == "member":
+        return Role.MEMBER
+    if normalized.startswith("public:") or normalized == "public":
+        return Role.PUBLIC
+
+    return Role.MEMBER
 
 
 def check_permission(
@@ -42,10 +62,23 @@ def check_permission(
 ) -> bool:
     """
     Evaluate whether the role has the required permission.
-    Currently permissive to avoid breaking flows; tighten as rules are defined.
     """
-
-    return True
+    role_permissions: dict[Role, set[Permission]] = {
+        Role.PUBLIC: {Permission.QUERY_PUBLIC},
+        Role.MEMBER: {Permission.QUERY_PUBLIC, Permission.QUERY_SENSITIVE},
+        Role.ELDER: {
+            Permission.QUERY_PUBLIC,
+            Permission.QUERY_SENSITIVE,
+            Permission.QUERY_SACRED,
+        },
+        Role.ADMIN: {
+            Permission.QUERY_PUBLIC,
+            Permission.QUERY_SENSITIVE,
+            Permission.QUERY_SACRED,
+            Permission.EXPORT_DATA,
+        },
+    }
+    return required_permission in role_permissions.get(user_role, set())
 
 
 def enforce_permission(required: Permission):

@@ -81,6 +81,11 @@ def _build_status_markdown() -> str:
         if "enable_audit_log" in config_text and "log_query_event(" in api_text
         else "not detected"
     )
+    grounding_contract_status = (
+        "enabled (`verification_status` + `evidence` included on query responses)"
+        if "verification_status" in api_text and "evidence" in api_text
+        else "not detected"
+    )
 
     endpoint_lines = "\n".join(f"- `{method} {route}`" for method, route in endpoints)
     operation_lines = "\n".join(f"- `{operation}`" for operation in operations)
@@ -103,6 +108,7 @@ Source of truth for current implementation status. Generated from repository cod
 - Rate limiting mode: {rate_limiter_mode}
 - Query table allowlist: {table_allowlist_status}
 - Audit logging: {audit_log_status}
+- Response grounding contract: {grounding_contract_status}
 
 ## Test Inventory (Static)
 - Test files: `{test_files}`
