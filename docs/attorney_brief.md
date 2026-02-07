@@ -1,4 +1,4 @@
-# GIS-OSS in Plain English
+# GIS-OSS — Summary for Tribal Legal Counsel
 
 This is the version you can hand to a busy attorney who wants to know, in plain language, what GIS-OSS is and why anyone would spend money on it.
 

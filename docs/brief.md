@@ -1,4 +1,4 @@
-# GIS-OSS Explained for Non-Tech Folks
+# GIS-OSS — Plain-Language Summary for Tribal Decision-Makers
 
 Give this to anyone who wants a plain, high-school-level summary of what GIS-OSS does and why it matters.
 

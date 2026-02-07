@@ -24,8 +24,8 @@ Incorporate the June 11 reviews (Claude & OpenAI) before new pilots.
 - [ ] Expand the audited spatial tool library to include topology validation, raster analytics, and pgRouting-style network analysis so production use cases are covered.
 - [ ] Add geodatabase versioning/conflict resolution workflows that mirror ArcGIS Enterprise expectations.
 - [ ] Publish GPU sizing, spatial indexing, caching, and batch-processing strategies to mitigate the highlighted performance risks.
-- [ ] Deliver the “walking skeleton” stack (PostGIS + pg_tileserv + TiTiler + STAC) alongside the three demo notebooks (`Treaty Defense`, `Sacred Site Storm`, `First Foods Forecast`) with NL→SQL/tool logs.
-- [ ] Create `contrib/benchmarks/` housing SpatialBench-Tribal scenarios wired into CI so the LLM router and policy checks are regression-tested.
+- [ ] Deliver the "walking skeleton" stack (PostGIS + pg_tileserv + TiTiler + STAC) alongside three demo notebooks (`Watershed Analysis`, `Sensitive-Site Governance`, `Habitat Monitoring`) with NL→SQL/tool logs.
+- [ ] Create `contrib/benchmarks/` housing SpatialBench scenarios wired into CI so the LLM router and policy checks are regression-tested.
 
 ### Interop & Packaging
 - [ ] Document ArcGIS/QGIS interoperability in detail (REST/service compatibility, schema translation, ArcPy migration paths, feature publication steps) for ESRI-heavy environments.
@@ -189,7 +189,7 @@ Incorporate the June 11 reviews (Claude & OpenAI) before new pilots.
 ### Data Curation & Annotation
 - [ ] Draft dataset acquisition plan (PostGIS docs, Tribal climate/water datasets, TEK-safe corpora, ESRI→PostGIS translations)
 - [ ] Build scraper/notebook for PostGIS documentation extraction
-- [ ] Collect 100 tribal environmental queries + annotate intents/domains/consent tags
+- [ ] Collect 100 domain-specific queries (environmental, watershed, habitat, tribal stewardship) + annotate intents/domains/consent tags
 - [ ] Curate ESRI ModelBuilder → PostGIS SQL mapping examples (watershed, habitat, fire)
 - [ ] Define annotation schema (intent, tools, narrative, consent) in docs/model_training.md
 - [ ] Evaluate labeling tools (Label Studio, Prodigy, custom Streamlit) for TEK permissions
@@ -206,22 +206,24 @@ Incorporate the June 11 reviews (Claude & OpenAI) before new pilots.
 - [ ] Define model versioning metadata in API responses
 - [ ] Plan adapter storage/deployment layout (`models/finetuned/<tier>/<version>`)
 - [ ] Document fallback escalation flow when router confidence is low
-- [ ] Benchmark Phase 1 accuracy against GeoBench + Tribal stewardship scenario set
+- [ ] Benchmark Phase 1 accuracy against GeoBench + domain-specific scenario sets
 
 ## Week 9: Community & Ecosystem
 
 ### Benchmarks & Prompt Library
-- [ ] Design SpatialBench-Tribal task list (10 initial scenarios) and licensing review
+- [ ] Design SpatialBench task list (10 initial scenarios) and licensing review
 - [ ] Build benchmark harness under `benchmarks/spatialbench/` with CI hooks
 - [ ] Publish prompt library structure (`prompts/`) with metadata schema (intent, consent, TEK labels)
 - [ ] Seed 25 prompts covering watershed defense, cultural resources, climate/fire, food sovereignty, restoration, EJ grants
 
 ### Partnerships & Outreach
 - [ ] Draft tribal partnership brief (pilot tribe shortlist + value props)
+- [ ] Draft conservation district partnership brief (pilot districts + value props)
+- [ ] Draft municipal/humanitarian partnership brief (pilot agencies + value props)
 - [ ] Prepare Docker-based lab kit for academic pilots
 - [ ] Set up community channels (GitHub Discussions, Slack) and contribution guidelines
 - [ ] Outline open-core vs enterprise feature matrix for public roadmap
-- [ ] Create conference engagement calendar (Indigenous Mapping Workshop, NCAI, Native American Fish & Wildlife Society)
+- [ ] Create conference engagement calendar (Indigenous Mapping Workshop, NCAI, Native American Fish & Wildlife Society, FOSS4G, URISA, AGU)
 
 ### Playground & Integrations
 - [ ] Build MapLibre web sandbox with NL query panel and tile overlays
@@ -273,7 +275,7 @@ Incorporate the June 11 reviews (Claude & OpenAI) before new pilots.
 - Accuracy benchmark harness
 
 **Week 9 (Community & Ecosystem)**:
-- SpatialBench-Tribal + prompt library seeded
+- SpatialBench + prompt library seeded
 - Partnership outreach kit prepared
 - Community channels and roadmap artifacts ready
 

@@ -19,7 +19,14 @@
 - Sponsor capstone projects building add-ons (e.g., flood modeling, transportation analytics).
 - Establish advisory council for periodic feedback on curriculum and tooling.
 
-### 3. Open Core + Enterprise
+### 3. Tribal & Indigenous Community Partnerships
+- Indigenous data sovereignty requirements drove GIS-OSS's governance architecture; tribal communities are the founding design-partner community.
+- Partner with tribal colleges, Indigenous Mapping Workshop, Native American Fish & Wildlife Society, and Indigenous Data Sovereignty networks.
+- Provide Docker-based lab kits and workshop materials tailored for tribal GIS teams and environmental departments.
+- Co-develop governance protocols (elder approval workflows, TK label enforcement, seasonal access) with tribal partners before shipping those features.
+- See `docs/community_process.md` for the full engagement framework including FPIC requirements, advisory bodies, and reciprocity commitments.
+
+### 4. Open Core + Enterprise
 - **Open Core**: core APIs, spatial toolkit, LLM orchestration, benchmarks, prompt library.
 - **Enterprise Add-ons**:
   - Advanced governance (audit signing, RLS templates).
@@ -28,7 +35,7 @@
   - Support / SLAs and customization services.
 - Transparent roadmap: community votes weigh into open-core features, enterprise funding accelerates regulated-industry requirements.
 
-### 4. Prompt & Scenario Library
+### 5. Prompt & Scenario Library
 - Curate prompts for common GIS questions: zoning, permit triage, disaster response, compliance, transportation.
 - Store under `prompts/` with metadata (intent, required datasets, expected outputs).
 - Provide Jupyter notebooks demonstrating prompts, expected SQL/tool chains, and result validation.

@@ -1,5 +1,7 @@
 # Tribal Environmental & Cultural Stewardship Playbook
 
+This is one of several planned domain playbooks for GIS-OSS. It represents the premier and founding use case — the one whose governance requirements drove the platform's architecture.
+
 This planning document captures proposed focus areas, exemplar workflows, data requirements, and success metrics that will
 guide GIS-OSS as we co-design with Tribal Nations and Indigenous-led environmental teams.
 
@@ -79,11 +81,13 @@ Implementation outline:
 - Number of cultural knowledge records preserved and repatriated.
 
 ## Target Tribal Partners (Design-Pilot Candidates)
-- **Swinomish Indian Tribal Community (WA)** — climate adaptation leaders; accessible data partnerships.
-- **Menominee Nation (WI)** — sustainable forestry & TEK integration.
-- **Blackfeet Nation (MT)** — wildlife corridor management, bison restoration.
-- **White Mountain Apache Tribe (AZ)** — watershed restoration, wildfire recovery.
-- Selection criteria: progressive data sovereignty policies, existing GIS capacity, pressing environmental challenges, willingness to co-develop.
+Selection criteria for pilot partners:
+- Progressive data sovereignty policies and governance infrastructure.
+- Existing GIS capacity (staff, hardware, or active interest in building capacity).
+- Pressing environmental challenges where spatial analytics can deliver measurable outcomes.
+- Willingness to co-develop and shape the platform's governance protocols.
+
+Specific partnerships will be identified through direct relationship-building, not public listing. See `docs/community_process.md` for our engagement framework.
 
 ## Engagement Roadmap
 1. **Phase 1 – Trust Building**
@@ -101,7 +105,7 @@ Implementation outline:
 
 ## Suggested Next Steps
 1. Build a **water rights analysis proof-of-concept** using publicly available hydrology + treaty data.
-2. Seed **SpatialBench-Tribal v0.1** with 10 tasks across the six pillars (see `benchmarks/` roadmap).
+2. Seed **SpatialBench v0.1** with 10 tasks across the six pillars (see `benchmarks/` roadmap).
 3. Curate **prompt library** (≥25 prompts) and notebooks under `prompts/tribal/`.
 4. Draft **partner outreach kit** (one-pager + slide deck) targeting pilot Tribes.
 5. Attend/engage with Indigenous Mapping Workshop, Indigenous Data Sovereignty conferences.
