@@ -1,0 +1,44 @@
+[
+  {
+    "id": "buffer_json_success",
+    "prompt": "Run this operation: {\"operation\":\"buffer\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[0,0]},\"distance\":100,\"units\":\"meters\"}",
+    "expect": {
+      "status": "success",
+      "operation": "buffer",
+      "verification_status": "verified"
+    }
+  },
+  {
+    "id": "nearest_neighbors_source_unverified",
+    "prompt": "Use this object: {\"operation\":\"nearest_neighbors\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[0,0]},\"table\":\"data.features\",\"limit\":2}",
+    "expect": {
+      "status": "success",
+      "operation": "nearest_neighbors",
+      "verification_status": "unverified"
+    }
+  },
+  {
+    "id": "prose_only_rejected",
+    "prompt": "Find nearby tribal lands",
+    "expect": {
+      "status": "error",
+      "error_contains": "structured operation JSON object"
+    }
+  },
+  {
+    "id": "unknown_operation_rejected",
+    "prompt": "Run this: {\"operation\":\"dissolve\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[0,0]}}",
+    "expect": {
+      "status": "error",
+      "error_contains": "Unsupported operation"
+    }
+  },
+  {
+    "id": "multiple_objects_rejected",
+    "prompt": "{\"operation\":\"buffer\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[0,0]},\"distance\":1} and {\"operation\":\"calculate_area\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[0,0],[1,0],[1,1],[0,0]]]}}",
+    "expect": {
+      "status": "error",
+      "error_contains": "Multiple operation JSON objects"
+    }
+  }
+]
