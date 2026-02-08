@@ -25,11 +25,12 @@ Source of truth for current implementation status. Generated from repository cod
 - Query table allowlist: enabled (`ALLOWED_QUERY_TABLES` in settings)
 - Audit logging: enabled (redacted DB audit writes on `/query`)
 - Response grounding contract: enabled (`verification_status` + `evidence` included on query responses)
+- API contract eval harness: enabled (`scripts/run_api_contract_eval.py` fixture checks)
 - Telemetry: trace correlation enabled in audit metadata (optional OTel)
 
 ## Test Inventory (Static)
-- Test files: `15`
-- Test cases (`def test_*`): `74`
+- Test files: `16`
+- Test cases (`def test_*`): `76`
 
 ## Notes
 - This document is generated. Do not hand-edit.

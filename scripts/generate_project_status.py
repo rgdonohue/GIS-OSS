@@ -97,6 +97,12 @@ def _build_status_markdown() -> str:
         if "verification_status" in api_text and "evidence" in api_text
         else "not detected"
     )
+    has_contract_eval = (ROOT / "scripts" / "run_api_contract_eval.py").exists()
+    contract_eval_status = (
+        "enabled (`scripts/run_api_contract_eval.py` fixture checks)"
+        if has_contract_eval
+        else "not detected"
+    )
     telemetry_status = (
         "trace correlation enabled in audit metadata (optional OTel)"
         if "otel_enabled" in config_text and "current_trace_id()" in api_text
@@ -126,6 +132,7 @@ Source of truth for current implementation status. Generated from repository cod
 - Query table allowlist: {table_allowlist_status}
 - Audit logging: {audit_log_status}
 - Response grounding contract: {grounding_contract_status}
+- API contract eval harness: {contract_eval_status}
 - Telemetry: {telemetry_status}
 
 ## Test Inventory (Static)

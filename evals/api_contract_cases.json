@@ -1,0 +1,65 @@
+[
+  {
+    "id": "query_pending_without_operation",
+    "endpoint": "/query",
+    "payload": {
+      "prompt": "Summarize nearby parks"
+    },
+    "expect": {
+      "result": "success",
+      "status_code": 200,
+      "status": "pending",
+      "verification_status": "unverified",
+      "evidence_length": 0
+    }
+  },
+  {
+    "id": "query_structured_buffer_success",
+    "endpoint": "/query",
+    "payload": {
+      "prompt": "Buffer this point",
+      "operation": "buffer",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.42, 37.77]
+      },
+      "distance": 250,
+      "units": "meters"
+    },
+    "expect": {
+      "result": "success",
+      "status_code": 200,
+      "status": "completed",
+      "operation": "buffer",
+      "verification_status": "verified",
+      "evidence_length": 1
+    }
+  },
+  {
+    "id": "query_natural_parse_error",
+    "endpoint": "/query/natural",
+    "payload": {
+      "prompt": "Find parks near me"
+    },
+    "expect": {
+      "result": "error",
+      "status_code": 400,
+      "error_contains": "structured operation JSON object"
+    }
+  },
+  {
+    "id": "query_natural_buffer_success",
+    "endpoint": "/query/natural",
+    "payload": {
+      "prompt": "Run this: {\"operation\":\"buffer\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[-122.42,37.77]},\"distance\":100,\"units\":\"meters\"}"
+    },
+    "expect": {
+      "result": "success",
+      "status_code": 200,
+      "status": "completed",
+      "operation": "buffer",
+      "verification_status": "verified",
+      "evidence_length": 1
+    }
+  }
+]

@@ -43,6 +43,9 @@ jobs:
       - name: Run grounding regression eval
         run: python scripts/run_grounding_eval.py
 
+      - name: Run API contract eval
+        run: python scripts/run_api_contract_eval.py
+
       - name: Run sample data provenance verification
         run: |
           if [ -f "data/osm/district-of-columbia-latest.osm.pbf" ]; then
