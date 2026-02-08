@@ -28,8 +28,8 @@ Source of truth for current implementation status. Generated from repository cod
 - Telemetry: trace correlation enabled in audit metadata (optional OTel)
 
 ## Test Inventory (Static)
-- Test files: `13`
-- Test cases (`def test_*`): `71`
+- Test files: `14`
+- Test cases (`def test_*`): `72`
 
 ## Notes
 - This document is generated. Do not hand-edit.

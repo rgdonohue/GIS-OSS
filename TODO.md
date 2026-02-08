@@ -22,15 +22,15 @@ Incorporate the June 11 reviews (Claude & OpenAI) before new pilots.
 
 ### Spatial Tooling & Performance
 - [ ] Expand the audited spatial tool library to include topology validation, raster analytics, and pgRouting-style network analysis so production use cases are covered.
-- [ ] Add geodatabase versioning/conflict resolution workflows that mirror ArcGIS Enterprise expectations.
+- [ ] Add spatial dataset versioning using PostGIS temporal tables and change tracking (not SDE-style branch versioning; see README for ESRI interop scope).
 - [ ] Publish GPU sizing, spatial indexing, caching, and batch-processing strategies to mitigate the highlighted performance risks.
 - [ ] Deliver the "walking skeleton" stack (PostGIS + pg_tileserv + TiTiler + STAC) alongside three demo notebooks (`Watershed Analysis`, `Sensitive-Site Governance`, `Habitat Monitoring`) with NL→SQL/tool logs.
 - [ ] Create `contrib/benchmarks/` housing SpatialBench scenarios wired into CI so the LLM router and policy checks are regression-tested.
 
 ### Interop & Packaging
-- [ ] Document ArcGIS/QGIS interoperability in detail (REST/service compatibility, schema translation, ArcPy migration paths, feature publication steps) for ESRI-heavy environments.
-- [ ] Publish an OGC service recipe plus a signed ArcGIS Pro `.pyt` toolbox and sample Pro project that call GIS-OSS endpoints without bypassing TK/BC policy checks.
-- [ ] Provide guidance for packaging offline/edge tiles (PMTiles/COGs to `.vtpk/.tpkx`) and define the OIDC-based identity boundary for ESRI clients.
+- [ ] Document ArcGIS/QGIS interoperability in detail (OGC service consumption, data exchange via ogr2ogr/File GDB, schema translation, ArcPy migration paths) for ESRI-heavy environments.
+- [ ] Publish an OGC service recipe plus an ArcGIS Pro `.pyt` Python toolbox and sample Pro project that call GIS-OSS endpoints while preserving governance checks.
+- [ ] Provide guidance for offline tile workflows: PMTiles/COGs served natively; document that ESRI-native formats (`.vtpk`/`.tpkx`) require ArcGIS Pro or the ArcGIS API for Python for packaging. Define OIDC-based identity boundary for ESRI clients.
 - [ ] Ship instructions for composing the edge/offline stack (TiTiler, pg_tileserv, STAC) and validating low-bandwidth raster pyramids pre-pilot.
 - [ ] Outline ESRI partnership/integration milestones to align with the suggested strategic positioning and partner outreach.
 
@@ -153,7 +153,7 @@ Incorporate the June 11 reviews (Claude & OpenAI) before new pilots.
 - [ ] Introduce Airflow docker service with minimal DAG (COG ingest, STAC refresh)
 - [ ] Bootstrap dbt project (`pipeline/dbt/`) with spatial models and tests
 - [ ] Wire CI-style `dbt run`/`dbt test` commands into developer workflow
-- [ ] Prototype ESRI geodatabase import/export bridge (supports BIA enterprise datasets)
+- [ ] Prototype ESRI File Geodatabase import/export via ogr2ogr with governance metadata passthrough (supports BIA enterprise datasets)
 - [ ] Define integration adapters for TAAMS/NIOGEMS metadata (read-only)
 
 ### Event-Driven & Streaming

@@ -14,7 +14,7 @@ The governance architecture was designed for **Indigenous data sovereignty** —
 - Privacy-first platform: open-weight LLMs, deterministic PostGIS/GDAL pipelines, and full audit trails — all self-hosted.
 - Pluggable governance layer: consent-aware data access, hierarchical approval workflows, automatic redaction, and cryptographically signed audit logs.
 - Offline-capable by default: local models, bundled CRS data, PMTiles basemaps, and air-gapped deployment paths.
-- Integrates with existing GIS ecosystems: QGIS, ArcGIS Pro, Jupyter, OGC services, and FME Server.
+- Designed to complement existing GIS investments: QGIS plugins, ArcGIS Pro Python toolboxes, OGC services, Jupyter, and FME Server connectors.
 - Initial design focus: Indigenous data sovereignty — with architecture applicable to any data-sensitive domain.
 
 ## Project Map
@@ -119,7 +119,34 @@ curl -X POST "http://localhost:8000/query" \
 - **Streaming**: Kafka/Redpanda topics for field telemetry; Kestra triggers downstream processing and alerting.
 - **Batch pipeline**: Airflow orchestrates ETL, dbt manages analytical models, Apache Sedona handles large-scale raster/vector crunching.
 - **Toolchain**: FastAPI + LLM orchestrator + deterministic PostGIS/GDAL tooling.
-- **Integrations**: QGIS plugin, ArcGIS Pro add-in, FME Server webhooks, Jupyter magics ensure humans stay in the loop.
+- **Integrations**: QGIS plugin, ArcGIS Pro Python toolbox, FME Server webhooks, Jupyter magics ensure humans stay in the loop.
+
+## ArcGIS Pro / ESRI Ecosystem Compatibility
+
+GIS-OSS is designed to complement ArcGIS, not replace it. Organizations with existing ESRI investments can adopt GIS-OSS for governance, privacy, and LLM-assisted analysis while keeping their current GIS workflows intact.
+
+**How it works together:**
+
+| Integration Path | Mechanism | Status |
+|------------------|-----------|--------|
+| **ArcGIS Pro Python Toolbox** | A `.pyt` toolbox calls the GIS-OSS REST API from within ArcGIS Pro. Analysts issue governed queries, and results return as feature classes usable in Pro maps and layouts. | Planned — standard ArcPy pattern |
+| **OGC Services (WMS/WMTS/MVT)** | pg_tileserv/martin and TiTiler serve OGC-compliant tiles. ArcGIS Pro consumes these as layer sources alongside ESRI data — no custom code required. | Planned — native Pro capability |
+| **Data Exchange (File GDB, GeoJSON, GeoPackage)** | `ogr2ogr` (GDAL) handles bidirectional conversion between PostGIS and ESRI File Geodatabases, Shapefiles, GeoJSON, and GeoPackage. Imports and exports pass through GIS-OSS governance checks. | Available via GDAL (dependency) |
+| **Shared Identity (OIDC)** | ArcGIS Enterprise/Portal and GIS-OSS can share the same identity provider (Okta, Azure AD, Keycloak) for single sign-on. | Planned (Phase 2) |
+| **ArcPy Migration Examples** | Model training data includes ESRI ModelBuilder/ArcPy → PostGIS SQL translation pairs, helping analysts understand equivalent operations. | Planned |
+
+**What GIS-OSS adds that ESRI doesn't offer:**
+- On-prem LLM reasoning over spatial data (no cloud dependency)
+- Consent-aware governance with hierarchical approval workflows and automatic redaction
+- Cryptographically signed audit trails for every query and export
+- TK/CARE label enforcement and data repatriation guarantees
+
+**Honest limitations:**
+- GIS-OSS does not emulate ESRI's proprietary Feature Service REST API. Data exchange uses standard formats (GeoJSON, File GDB, OGC services), not live Feature Service connections.
+- Offline tile packaging in ESRI-native formats (`.vtpk`, `.tpkx`) requires ArcGIS Pro or the ArcGIS API for Python. GIS-OSS serves PMTiles, MBTiles, and COGs natively.
+- ESRI's versioned geodatabase model is proprietary. GIS-OSS provides spatial dataset versioning through PostGIS temporal tables and change tracking, not SDE-style branch versioning.
+
+See `docs/developer_experience.md` for integration details and the ArcGIS Pro toolbox roadmap.
 
 ## Architecture Overview
 

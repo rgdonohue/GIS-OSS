@@ -2,7 +2,7 @@
 
 ## Goals
 - Make GIS-OSS consumable through clear APIs, typed SDKs, and turnkey sandboxes.
-- Provide reference integrations for ESRI and open-source GIS tooling.
+- Provide reference integrations for ArcGIS Pro (Python toolbox), QGIS, and open-source GIS tooling.
 - Offer guardrails (validation, auditing) without constraining advanced users.
 
 ## API Documentation
@@ -35,10 +35,10 @@
 - **Notebook kits**: Jupyter templates (`notebooks/`) invoking the SDK for workshop exercises.
 - **Sample datasets**: GeoParquet, COG, PMTiles curated in `data/samples/` with licensing metadata.
 - **Scenario bundles**: Ready-to-run demos (e.g., emergency response, urban planning) packaged with instructions.
-- **Enterprise Hooks**: FME Server workspace template, ArcGIS Pro add-in library, and REST connectors with signed requests.
+- **Enterprise Hooks**: FME Server workspace template, ArcGIS Pro Python toolbox (`.pyt`), and REST connectors with signed requests.
 
 ## Integration Paths
-- **ESRI**: REST connector examples (ArcGIS Pro Python toolbox, Feature Service exports).
+- **ArcGIS Pro**: Python toolbox (`.pyt`) calling the REST API; results returned as feature classes. OGC services (WMS/WMTS/MVT from pg_tileserv and TiTiler) consumed as native layer sources. Data exchange via ogr2ogr (File GDB, GeoJSON, GeoPackage). See README for full ESRI interop scope and honest limitations.
 - **QGIS**: Plugin skeleton calling the API/SDK, with offline support via PMTiles.
 - **Workflow engines**: FME/Kestra recipes for ingest and automation.
 - **CI/CD**: GitHub Actions template running lint, tests, dbt, and contract tests against the API.
@@ -48,5 +48,5 @@
 1. Generate initial OpenAPI spec + Redoc documentation.
 2. Scaffold Python SDK (`sdk/python/`) with basic query/response types and unit tests.
 3. Launch Swagger/Redoc portal and web playground.
-4. Release QGIS plugin template and ArcGIS Pro toolbox sample.
+4. Release QGIS plugin template and ArcGIS Pro Python toolbox (`.pyt`) sample.
 5. Publish comprehensive integration guide in `docs/integration.md`.

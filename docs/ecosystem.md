@@ -31,7 +31,7 @@
 - **Enterprise Add-ons**:
   - Advanced governance (audit signing, RLS templates).
   - High-availability deployments (Kubernetes operators, managed PostGIS).
-  - Premium integrations (FME Server connectors, ESRI extension packages).
+  - Premium integrations (FME Server connectors, ArcGIS Pro Python toolbox templates, enterprise data exchange adapters).
   - Support / SLAs and customization services.
 - Transparent roadmap: community votes weigh into open-core features, enterprise funding accelerates regulated-industry requirements.
 
