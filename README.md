@@ -192,6 +192,8 @@ See `docs/developer_experience.md` for integration details and the ArcGIS Pro to
 5. Run quality grounding checks:
    - `python scripts/run_grounding_eval.py`
    - `python scripts/verify_sample_data_provenance.py`
+6. Bootstrap an authoritative baseline dataset (optional but recommended):
+   - `python scripts/fetch_authoritative_dataset.py --dataset-id us-census-states-cb-2024-20m`
 
 ### For Offline/Air-gapped Deployment
 1. On a connected machine, run `./scripts/prepare_offline.sh` to download all dependencies.

@@ -10,6 +10,15 @@
       "local_relative_path": "data/osm/district-of-columbia-latest.osm.pbf",
       "stac_item_relative_path": "data/stac/osm_dc_sample_item.json",
       "expected_sha256": ""
+    },
+    {
+      "id": "us-census-states-cb-2024-20m",
+      "title": "U.S. Census Cartographic Boundary States (2024, 1:20m)",
+      "source_url": "https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_state_20m.zip",
+      "license": "Public Domain (17 U.S.C. § 105)",
+      "attribution": "U.S. Census Bureau TIGER/Line cartographic boundary files",
+      "local_relative_path": "data/authoritative/us_census/cb_2024_us_state_20m.zip",
+      "expected_sha256": ""
     }
   ]
 }
